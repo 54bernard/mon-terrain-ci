@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mon Terrain en Côte d'Ivoire</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Terrains à vendre en Côte d'Ivoire : Cocody, Bingerville, Anyama, Songon, Jacqueville, Assini, Vitré, Yamoussoukro. ACD, titre foncier ou approbation. Signature chez le notaire.">
+<meta name="theme-color" content="#0f2e1f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: la parcelle comme motif — fond quadrillé de lots, fiches empilées en 3D, catalogue filtrable, bento, simulateur */
+:root{
+  --forest:#0f2e1f;        /* fond des fiches */
+  --forest-2:#174a31;
+  --leaf:#2e9a4e;
+  --orange:#ee8a26;
+  --orange-2:#ffb15e;
+  --navy:#1c4766;
+  --bg:#f4f3ee;
+  --surface:#ffffff;
+  --surface-2:#ebeee6;
+  --ink:#122219;
+  --muted:#56655b;
+  --line:rgba(18,34,25,.1);
+  --glass:rgba(255,255,255,.72);
+  --glass-line:rgba(255,255,255,.55);
+  --accent-ink:#b15a06;
+  --leaf-ink:#1f7a3c;
+  --shadow-lg:0 30px 80px -20px rgba(15,46,31,.35);
+  --shadow:0 1px 1px rgba(15,46,31,.04),0 12px 32px -12px rgba(15,46,31,.18);
+  --f-display:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:22px;
+  --wrap:1220px;
+  --gl:max(16px,env(safe-area-inset-left,0px));
+  --gr:max(16px,env(safe-area-inset-right,0px));
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0a1610;--surface:#11221a;--surface-2:#162b20;--ink:#ecf2ed;--muted:#a3b5a9;--line:rgba(236,242,237,.1);
+  --glass:rgba(17,34,26,.72);--glass-line:rgba(255,255,255,.08);--accent-ink:#ffab55;--leaf-ink:#5cc97c;
+  --shadow:0 1px 1px rgba(0,0,0,.3),0 12px 32px -12px rgba(0,0,0,.6);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a1610;--surface:#11221a;--surface-2:#162b20;--ink:#ecf2ed;--muted:#a3b5a9;--line:rgba(236,242,237,.1);
+  --glass:rgba(17,34,26,.72);--glass-line:rgba(255,255,255,.08);--accent-ink:#ffab55;--leaf-ink:#5cc97c;
+  --shadow:0 1px 1px rgba(0,0,0,.3),0 12px 32px -12px rgba(0,0,0,.6);color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:80;background:var(--forest)}
+h1,h2,h3{font-family:var(--f-display);line-height:1.08;margin:0;text-wrap:balance;letter-spacing:-.02em}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:3px;border-radius:8px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:var(--gl);padding-right:var(--gr)}
+.kicker{display:inline-flex;align-items:center;gap:.6em;font-family:var(--f-display);font-weight:800;font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-ink)}
+.kicker::before{content:"";width:22px;height:2px;background:currentColor;border-radius:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.55em;font-family:var(--f-display);font-weight:800;font-size:.92rem;border-radius:999px;padding:.95em 1.5em;text-decoration:none;border:0;cursor:pointer;transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s,background .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn svg{width:1.2em;height:1.2em;flex:none}
+.btn-primary{background:var(--orange);color:#1a1205;box-shadow:0 10px 30px -10px rgba(238,138,38,.8)}
+.btn-primary:hover{background:var(--orange-2)}
+.btn-glass{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(8px)}
+.btn-soft{background:var(--surface-2);color:var(--ink)}
+
+/* ---------- scroll progress + header ---------- */
+.progress{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:3px;z-index:90;background:linear-gradient(90deg,var(--orange),var(--orange-2));transform-origin:0 50%;transform:scaleX(0)}
+@supports (animation-timeline:scroll()){.progress{animation:grow linear both;animation-timeline:scroll(root)}}
+@keyframes grow{to{transform:scaleX(1)}}
+header.site{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:0;right:0;z-index:70;padding-left:var(--gl);padding-right:var(--gr);pointer-events:none}
+.bar{pointer-events:auto;max-width:var(--wrap);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.5rem .5rem .5rem .7rem;border-radius:999px;background:rgba(15,46,31,.45);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);color:#fff;transition:background .3s,color .3s,border-color .3s,box-shadow .3s}
+header.scrolled .bar{background:var(--glass);color:var(--ink);border-color:var(--glass-line);box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;min-width:0}
+.brand img{width:44px;height:44px;border-radius:50%;background:#fff;flex:none}
+.brand b{white-space:nowrap;font-family:var(--f-display);font-weight:900;font-size:1rem;line-height:1;letter-spacing:-.01em}
+.brand small{display:block;font-family:var(--f-display);font-weight:700;font-size:.62rem;letter-spacing:.18em;color:var(--orange);margin-top:.3em}
+nav.main{display:flex;align-items:center;gap:.2rem}
+nav.main a{font-family:var(--f-display);font-weight:700;font-size:.86rem;text-decoration:none;padding:.6em .9em;border-radius:999px;transition:background .2s}
+nav.main a:hover{background:rgba(127,127,127,.16)}
+.bar-actions{display:flex;align-items:center;gap:.4rem}
+.icon-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(127,127,127,.14);border:0;cursor:pointer;position:relative}
+.icon-btn svg{width:20px;height:20px}
+.icon-btn .count{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--orange);color:#1a1205;font-size:.68rem;font-weight:800;display:grid;place-items:center}
+.bar .btn{padding:.75em 1.15em;font-size:.84rem}
+#menuBtn{display:none}
+@media (max-width:980px){
+  nav.main{position:absolute;top:calc(100% + 8px);left:var(--gl);right:var(--gr);flex-direction:column;align-items:stretch;background:var(--surface);color:var(--ink);border-radius:20px;padding:.6rem;box-shadow:var(--shadow-lg);border:1px solid var(--line)}
+  nav.main a{padding:.9rem 1rem}
+  nav.main:not(.open){display:none}
+  #menuBtn{display:grid}
+  .bar .btn-wa-label{display:none}
+  .bar .btn{padding:0;width:42px;height:42px}
+}
+@media (max-width:420px){.brand small{display:none}.brand b{font-size:.9rem}#themeBtn{display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;background:var(--forest);color:#fff;overflow:hidden;isolation:isolate}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.hero::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse 60% 70% at 78% 40%,rgba(238,138,38,.22),transparent 60%),radial-gradient(ellipse 50% 60% at 10% 100%,rgba(46,154,78,.35),transparent 60%),linear-gradient(180deg,transparent 70%,rgba(10,22,16,.5))}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:3rem;align-items:center;padding-block:9.5rem 5rem}
+.pill{display:inline-flex;align-items:center;gap:.55rem;padding:.4rem .9rem .4rem .45rem;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-size:.85rem;font-weight:600}
+.pill i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 4px rgba(74,222,128,.2);margin-left:.4rem;font-style:normal}
+.hero h1{font-weight:900;font-size:clamp(2.6rem,6.4vw,5.2rem);margin:1.3rem 0 1.2rem;letter-spacing:-.035em}
+.hero h1 .o{color:var(--orange);display:block}
+.hero h1 .line{display:block;animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.hero h1 .line:nth-child(2){animation-delay:.12s}
+@keyframes rise{from{transform:translateY(24px);opacity:.001}}
+.hero .lead{font-size:1.12rem;color:#c8d8cd;max-width:34em}
+.hero .lead b{color:#fff}
+
+.search{margin-top:2rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:.4rem;padding:.45rem;border-radius:24px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);max-width:720px}
+.search .f{display:flex;flex-direction:column;padding:.45rem .9rem;border-radius:18px;background:rgba(255,255,255,.06);min-width:0}
+.search label{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#a9c2b2}
+.search select{appearance:none;background:transparent;border:0;color:#fff;font:inherit;font-weight:700;font-size:.95rem;padding:.1rem 0;width:100%;cursor:pointer}
+.search select option{color:#122219}
+.search .btn{border-radius:18px}
+@media (max-width:720px){.search{grid-template-columns:1fr 1fr}.search .btn{grid-column:1/-1}}
+@media (max-width:420px){.search{grid-template-columns:1fr}}
+.trust{display:flex;flex-wrap:wrap;gap:1.4rem;margin-top:1.8rem;color:#c8d8cd;font-size:.9rem}
+.trust span{display:inline-flex;align-items:center;gap:.45rem}
+.trust svg{width:18px;height:18px;color:var(--orange)}
+
+.deck{position:relative;height:520px;perspective:1400px}
+.deck button{position:absolute;top:50%;left:50%;width:300px;max-width:78%;aspect-ratio:4/5;border:0;padding:0;border-radius:20px;overflow:hidden;cursor:pointer;background:#fff;box-shadow:var(--shadow-lg);transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .9s,filter .9s;transform-style:preserve-3d}
+.deck img{width:100%;height:100%;object-fit:cover}
+.deck .float{position:absolute;z-index:20;background:var(--surface);color:var(--ink);border-radius:16px;padding:.7rem .95rem;box-shadow:var(--shadow-lg);font-size:.82rem;display:flex;gap:.6rem;align-items:center;animation:bob 5s ease-in-out infinite}
+.deck .float b{display:block;font-family:var(--f-display);font-size:1rem}
+.deck .float .dot{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(238,138,38,.15);color:var(--accent-ink)}
+.deck .float .dot svg{width:18px;height:18px}
+.deck .f1{left:0;top:16%}
+.deck .f2{right:0;bottom:12%;animation-delay:-2.5s}
+@keyframes bob{50%{transform:translateY(-10px)}}
+@media (max-width:900px){.hero .wrap{grid-template-columns:1fr;padding-block:8rem 3.5rem}.deck{height:430px}}
+@media (max-width:480px){.deck{height:380px}.deck .float{display:none}}
+
+/* marquee */
+.marquee{background:var(--orange);color:#1a1205;overflow:hidden;padding-block:.9rem;font-family:var(--f-display);font-weight:900;font-size:1.05rem;text-transform:uppercase;letter-spacing:.04em}
+.marquee .track{display:flex;width:max-content;gap:2.2rem;animation:slide 38s linear infinite}
+.marquee .item{display:inline-flex;align-items:center;gap:2.2rem;white-space:nowrap}
+.marquee .item::after{content:"";width:10px;height:10px;border-radius:2px;background:var(--forest);transform:rotate(45deg)}
+.marquee button{all:unset;cursor:pointer;display:inline-flex;align-items:baseline;gap:.5rem;font:inherit;text-transform:inherit;letter-spacing:inherit}
+.marquee button:hover{text-decoration:underline;text-underline-offset:4px}
+.marquee button:focus-visible{outline:2px solid var(--forest);outline-offset:4px;border-radius:4px}
+.marquee button small{font-family:var(--f-body);font-weight:800;font-size:.72rem;letter-spacing:.06em;background:var(--forest);color:#fff;border-radius:999px;padding:.2em .6em}
+.marquee:hover .track,.marquee:focus-within .track{animation-play-state:paused}
+
+/* localités carousel */
+.zones-sec{padding-block:4.5rem 1rem}
+.zc-head{display:flex;justify-content:space-between;align-items:end;gap:1rem;flex-wrap:wrap;margin-bottom:1.6rem}
+.zc-head h2{font-weight:900;font-size:clamp(2rem,4.4vw,3.3rem);margin-top:.7rem}
+.zc-nav{display:flex;gap:.5rem}
+.zc-nav button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:grid;place-items:center;color:var(--ink);transition:background .2s}
+.zc-nav button:hover{background:var(--orange);color:#1a1205;border-color:transparent}
+.zc-nav svg{width:20px;height:20px}
+.zc{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-left:var(--gl);padding:.4rem var(--gr) 1.4rem var(--gl);scrollbar-width:none;overscroll-behavior-x:contain}
+.zc::-webkit-scrollbar{display:none}
+.zc-wrap{max-width:calc(var(--wrap) + 400px);margin:0 auto;position:relative}
+.zc-wrap::before,.zc-wrap::after{content:"";position:absolute;top:0;bottom:1.4rem;width:40px;z-index:2;pointer-events:none}
+.zc-wrap::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.zc-wrap::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.zcard{flex:0 0 min(300px,80vw);scroll-snap-align:start;border-radius:var(--r);overflow:hidden;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;text-align:left;padding:0;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;color:var(--ink)}
+.zcard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.zcard .zimg{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--forest)}
+.zcard .zimg img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.zcard:hover .zimg img{transform:scale(1.08)}
+.zcard .zimg::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(10,22,16,.85))}
+.zcard .zname{position:absolute;left:1rem;right:1rem;bottom:.85rem;z-index:1;color:#fff;font-family:var(--f-display);font-weight:900;font-size:1.5rem;line-height:1.05;letter-spacing:-.02em}
+.zcard .zcount{position:absolute;top:.8rem;left:.8rem;z-index:1;background:var(--orange);color:#1a1205;font-family:var(--f-display);font-weight:800;font-size:.72rem;padding:.4em .8em;border-radius:999px}
+.zcard .zbody{padding:1rem 1.1rem 1.2rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.zcard .zplaces{display:flex;flex-wrap:wrap;gap:.3rem}
+.zcard .zplaces span{font-size:.76rem;font-weight:700;background:var(--surface-2);border-radius:999px;padding:.25em .7em;color:var(--muted)}
+.zcard .zfrom{margin-top:auto;font-size:.82rem;color:var(--muted);font-weight:600}
+.zcard .zfrom b{display:block;font-family:var(--f-display);font-size:1.15rem;color:var(--ink);font-weight:900;font-variant-numeric:tabular-nums}
+.zcard .zgo{font-family:var(--f-display);font-weight:800;font-size:.84rem;color:var(--accent-ink)}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* reveal on scroll (progressive: visible by default) */
+@supports (animation-timeline:view()){
+  .reveal{animation:reveal linear both;animation-timeline:view();animation-range:entry 0% entry 40%}
+  @keyframes reveal{from{opacity:.35;transform:translateY(40px) scale(.98)}}
+}
+
+/* ---------- sections ---------- */
+section.block{padding-block:6rem}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:1.5rem;margin-bottom:2.4rem}
+.head h2{font-weight:900;font-size:clamp(2rem,4.4vw,3.3rem);margin-top:.7rem}
+.head p{color:var(--muted);max-width:32em;font-size:1.02rem}
+
+/* ---------- bento ---------- */
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(170px,auto);gap:1rem}
+.tile{border-radius:var(--r);padding:1.6rem;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between;gap:1rem;overflow:hidden;position:relative;min-width:0}
+.tile .big{font-family:var(--f-display);font-weight:900;font-size:clamp(2.4rem,4.5vw,3.6rem);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.tile h3{font-size:1.15rem;font-weight:800}
+.tile p{color:var(--muted);font-size:.95rem}
+.tile.dark{background:var(--forest);color:#fff;border-color:transparent}
+.tile.dark p{color:#bcd0c3}
+.tile.orange{background:var(--orange);color:#1a1205;border-color:transparent}
+.tile.orange p{color:#4a2c08}
+.tile.photo{padding:0;grid-row:span 2}
+.tile.photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.tile.photo .cap{position:relative;margin-top:auto;padding:1.4rem;background:linear-gradient(transparent,rgba(10,22,16,.9));color:#fff}
+.tile.photo .cap p{color:#d4e2d8}
+.t-wide{grid-column:span 2}
+.tile .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:rgba(238,138,38,.14);color:var(--accent-ink)}
+.tile.dark .ic{background:rgba(255,255,255,.1);color:var(--orange)}
+.tile .ic svg{width:22px;height:22px}
+.tile .plots{position:absolute;right:-20px;bottom:-20px;width:180px;height:180px;opacity:.18;background-image:linear-gradient(currentColor 2px,transparent 2px),linear-gradient(90deg,currentColor 2px,transparent 2px);background-size:36px 36px}
+@media (max-width:900px){.bento{grid-template-columns:1fr 1fr}.tile.photo{grid-row:span 1;min-height:280px}}
+@media (max-width:520px){.bento{grid-template-columns:1fr}.t-wide{grid-column:auto}}
+
+/* ---------- catalogue ---------- */
+.toolbar{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:space-between;padding:.6rem;border-radius:22px;background:var(--surface);border:1px solid var(--line);margin-bottom:1.4rem;position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);z-index:20;box-shadow:var(--shadow)}
+.seg{display:flex;gap:.25rem;padding:.25rem;border-radius:16px;background:var(--surface-2);flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:.55rem 1rem;border-radius:12px;font-family:var(--f-display);font-weight:700;font-size:.84rem;cursor:pointer;color:var(--muted);display:inline-flex;gap:.4rem;align-items:center}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.seg button svg{width:14px;height:14px}
+.tb-right{display:flex;gap:.5rem;flex-wrap:wrap}
+.tb-right select{font:inherit;font-weight:700;font-size:.86rem;padding:.6rem 2rem .6rem .9rem;border-radius:14px;border:1px solid var(--line);background:var(--surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2356655b' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right .6rem center/14px no-repeat;color:var(--ink);appearance:none;cursor:pointer;max-width:100%}
+@media (max-width:720px){.toolbar{position:static}}
+.result-line{color:var(--muted);margin:0 0 1.2rem .3rem;font-size:.92rem;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.3rem}
+@media (max-width:400px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;view-transition-name:var(--vt)}
+.card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.media{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--forest)}
+.media .open{position:absolute;inset:0;border:0;padding:0;background:none;cursor:zoom-in;width:100%}
+.media img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.card:hover .media img{transform:scale(1.07)}
+.media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,22,16,.35),transparent 35%,transparent 50%,rgba(10,22,16,.88));pointer-events:none}
+.badges{position:absolute;top:.8rem;left:.8rem;right:3.8rem;display:flex;flex-wrap:wrap;gap:.35rem;z-index:2;pointer-events:none}
+.badge{font-family:var(--f-display);font-weight:800;font-size:.68rem;letter-spacing:.04em;padding:.42em .8em;border-radius:999px;background:rgba(255,255,255,.92);color:#122219;backdrop-filter:blur(6px)}
+.badge.o{background:var(--orange);color:#1a1205;text-transform:uppercase}
+.badge.hot{background:#122219;color:#fff}
+.fav{position:absolute;top:.7rem;right:.7rem;z-index:3;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.92);display:grid;place-items:center;cursor:pointer;transition:transform .2s;color:#122219}
+.fav:active{transform:scale(.88)}
+.fav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+.fav[aria-pressed="true"]{color:#e0452b}
+.fav[aria-pressed="true"] svg{fill:currentColor;animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.35)}}
+.where{position:absolute;left:1rem;right:1rem;bottom:.9rem;z-index:2;color:#fff;pointer-events:none}
+.where small{display:flex;gap:.35rem;align-items:center;font-size:.78rem;font-weight:700;color:#ffd2a1;text-transform:uppercase;letter-spacing:.08em}
+.where small svg{width:13px;height:13px;fill:currentColor}
+.where b{display:block;font-family:var(--f-display);font-weight:900;font-size:1.25rem;line-height:1.15;margin-top:.15rem}
+.body{padding:1.2rem 1.3rem 1.3rem;display:flex;flex-direction:column;gap:1rem;flex:1}
+.body h3{font-size:1.05rem;font-weight:800;letter-spacing:-.01em}
+.price{display:flex;align-items:baseline;flex-wrap:wrap;gap:.1rem .45rem}
+.price .amt{font-family:var(--f-display);font-weight:900;font-size:1.75rem;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.price .unit{font-weight:800;font-size:.85rem;color:var(--accent-ink)}
+.price .total{flex-basis:100%;font-size:.84rem;color:var(--muted);font-weight:600}
+.specs{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.3fr) minmax(0,.95fr);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.specs div{padding:.55rem .7rem;min-width:0}
+.specs div+div{border-left:1px solid var(--line)}
+.specs span{display:block;font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.specs b{display:block;font-family:var(--f-display);font-size:.82rem;font-weight:800;overflow-wrap:break-word;line-height:1.25;margin-top:.1rem}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:.3rem;font-size:.93rem;color:var(--muted)}
+.checks li{display:flex;gap:.5rem;align-items:flex-start}
+.checks li::before{content:"";flex:none;width:16px;height:16px;margin-top:.25em;border-radius:50%;background:var(--leaf) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/11px no-repeat}
+.foot{margin-top:auto;display:grid;grid-template-columns:1fr auto;gap:.5rem}
+.foot .btn{padding:.8em 1em;font-size:.84rem}
+.empty{grid-column:1/-1;padding:3rem 1.5rem;text-align:center;border:2px dashed var(--line);border-radius:var(--r);color:var(--muted);display:grid;gap:1rem;justify-items:center}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.35s}
+
+/* ---------- simulateur ---------- */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
+.sim-panel{border-radius:var(--r);padding:2rem;background:var(--surface);border:1px solid var(--line);display:grid;gap:1.2rem;align-content:start}
+.sim-panel label{font-size:.72rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.4rem}
+.sim-panel select,.sim-panel input[type=number]{width:100%;font:inherit;font-weight:700;padding:.85rem 1rem;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink)}
+.range-row{display:flex;gap:1rem;align-items:center}
+input[type=range]{flex:1;accent-color:var(--orange);min-width:0}
+.range-row output{font-family:var(--f-display);font-weight:800;min-width:7ch;text-align:right;font-variant-numeric:tabular-nums}
+.sim-out{border-radius:var(--r);padding:2rem;background:var(--forest);color:#fff;display:flex;flex-direction:column;gap:1rem;justify-content:space-between;position:relative;overflow:hidden}
+.sim-out .plots{position:absolute;inset:0;opacity:.08;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:44px 44px}
+.sim-out>*{position:relative}
+.sim-out .lbl{color:#a9c2b2;font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+.sim-out .amount{font-family:var(--f-display);font-weight:900;font-size:clamp(2rem,5vw,3.4rem);letter-spacing:-.04em;line-height:1;color:var(--orange);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.sim-out .detail{color:#c8d8cd;font-size:.95rem}
+.sim-out dl{display:grid;grid-template-columns:auto 1fr;gap:.4rem 1rem;margin:0;font-size:.92rem}
+.sim-out dt{color:#a9c2b2}
+.sim-out dd{margin:0;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.sim-note{font-size:.82rem;color:#a9c2b2}
+@media (max-width:860px){.sim{grid-template-columns:1fr}}
+
+/* ---------- documents ---------- */
+.docs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1rem}
+.doc{border-radius:var(--r);padding:1.4rem;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:.6rem;transition:border-color .2s,transform .2s;cursor:pointer;text-align:left}
+.doc:hover{border-color:var(--orange);transform:translateY(-3px)}
+.doc .abbr{font-family:var(--f-display);font-weight:900;font-size:1.7rem;letter-spacing:-.03em;color:var(--accent-ink)}
+.doc h3{font-size:.98rem;font-weight:800}
+.doc p{color:var(--muted);font-size:.9rem;flex:1}
+.doc .n{font-size:.8rem;font-weight:800;color:var(--leaf-ink);display:flex;justify-content:space-between}
+@media (max-width:1050px){.docs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:680px){.docs{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.docs{grid-template-columns:1fr}}
+
+/* ---------- steps ---------- */
+.process{background:var(--forest);color:#fff;border-radius:36px;margin-inline:max(8px,env(safe-area-inset-left,0px));position:relative;overflow:hidden}
+.process .head p{color:#bcd0c3}
+.process .kicker{color:var(--orange)}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;counter-reset:s}
+.steps li{counter-increment:s;padding:1.6rem;border-radius:var(--r);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;gap:.7rem}
+.steps li::before{content:"0" counter(s);font-family:var(--f-display);font-weight:900;font-size:2.6rem;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.5px var(--orange);line-height:1}
+.steps h3{font-size:1.1rem;font-weight:800}
+.steps p{color:#bcd0c3;font-size:.94rem}
+@media (max-width:900px){.steps{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.steps{grid-template-columns:1fr}}
+
+/* ---------- FAQ ---------- */
+.faq-wrap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:3rem;align-items:start}
+.faq{display:grid;gap:.6rem}
+.faq details{border-radius:18px;background:var(--surface);border:1px solid var(--line);padding:0 1.3rem;transition:border-color .2s}
+.faq details[open]{border-color:var(--orange)}
+.faq summary{list-style:none;cursor:pointer;padding:1.15rem 0;font-family:var(--f-display);font-weight:800;font-size:1rem;display:flex;justify-content:space-between;gap:1rem;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:1.5rem;font-weight:600;color:var(--accent-ink);transition:transform .25s;flex:none}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding-bottom:1.2rem;color:var(--muted)}
+@media (max-width:860px){.faq-wrap{grid-template-columns:1fr;gap:1.5rem}}
+
+/* ---------- contact ---------- */
+.cta{border-radius:36px;background:linear-gradient(135deg,var(--orange),#f6a04a);color:#1a1205;padding:clamp(2rem,5vw,4rem);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2.5rem;align-items:center;position:relative;overflow:hidden}
+.cta .plots{position:absolute;inset:0;opacity:.12;background-image:linear-gradient(#1a1205 1.5px,transparent 1.5px),linear-gradient(90deg,#1a1205 1.5px,transparent 1.5px);background-size:52px 52px;mask-image:radial-gradient(circle at 85% 50%,#000,transparent 70%);-webkit-mask-image:radial-gradient(circle at 85% 50%,#000,transparent 70%)}
+.cta>*{position:relative}
+.cta h2{font-weight:900;font-size:clamp(2rem,4.4vw,3.2rem)}
+.cta p{color:#4a2c08;margin-top:1rem;font-size:1.05rem;max-width:30em}
+.phone-row{display:flex;flex-wrap:wrap;align-items:center;gap:.8rem;margin-top:1.6rem}
+.phone{font-family:var(--f-display);font-weight:900;font-size:clamp(1.4rem,3vw,2rem);letter-spacing:-.02em;user-select:all;font-variant-numeric:tabular-nums}
+.copy{border:1px solid rgba(26,18,5,.3);background:rgba(255,255,255,.25);border-radius:999px;padding:.4em 1em;font-weight:700;font-size:.85rem;cursor:pointer;color:#1a1205}
+.form{background:var(--surface);color:var(--ink);border-radius:26px;padding:1.6rem;display:grid;grid-template-columns:1fr 1fr;gap:.8rem;box-shadow:var(--shadow-lg)}
+.form .full{grid-column:1/-1}
+.form label{font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3rem}
+.form input,.form select,.form textarea{width:100%;font:inherit;padding:.8rem .95rem;border-radius:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink)}
+.form textarea{min-height:96px;resize:vertical}
+.form .btn{width:100%}
+.form .note{font-size:.84rem;color:var(--muted)}
+.btn-dark{background:var(--forest);color:#fff}
+@media (max-width:860px){.cta{grid-template-columns:1fr}}
+@media (max-width:480px){.form{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{padding-block:4rem 7rem;color:var(--muted);font-size:.93rem}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:2rem;border-top:1px solid var(--line);padding-top:3rem}
+footer h4{font-family:var(--f-display);color:var(--ink);font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;margin:0 0 .9rem}
+footer ul{list-style:none;padding:0;margin:0;display:grid;gap:.4rem}
+footer a{text-decoration:none}
+footer a:hover{color:var(--accent-ink)}
+footer .legal{margin-top:2.5rem;display:flex;flex-wrap:wrap;gap:.5rem;justify-content:space-between;font-size:.84rem}
+@media (max-width:720px){footer .cols{grid-template-columns:1fr}}
+
+/* ---------- floating + mobile dock ---------- */
+.wa-float{position:fixed;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;width:62px;height:62px;border-radius:50%;background:#25d366;display:grid;place-items:center;box-shadow:0 12px 30px -6px rgba(37,211,102,.6)}
+.wa-float::before{content:"";position:absolute;inset:0;border-radius:50%;background:#25d366;animation:ping 2.4s cubic-bezier(0,0,.2,1) infinite;z-index:-1}
+@keyframes ping{75%,100%{transform:scale(1.6);opacity:0}}
+.wa-float svg{width:32px;height:32px;fill:#fff}
+.dock{display:none}
+@media (max-width:720px){
+  .wa-float{display:none}
+  .dock{display:grid;grid-template-columns:repeat(3,1fr);gap:.3rem;position:fixed;left:0;right:0;bottom:0;z-index:60;padding:.5rem max(12px,env(safe-area-inset-right,0px)) calc(.5rem + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px));background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+  .dock a,.dock button{display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.45rem;border-radius:14px;text-decoration:none;font-size:.72rem;font-weight:800;background:none;border:0;cursor:pointer;color:var(--ink)}
+  .dock svg{width:22px;height:22px}
+  .dock .wa{background:#25d366;color:#fff}
+}
+
+/* ---------- dialog ---------- */
+dialog{border:0;padding:0;border-radius:26px;width:min(980px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--surface);color:var(--ink);overflow:auto}
+dialog::backdrop{background:rgba(5,14,9,.7);backdrop-filter:blur(6px)}
+dialog[open]{animation:dlg .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes dlg{from{transform:translateY(20px) scale(.97);opacity:.001}}
+.dlg{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.dlg-img{background:var(--forest);display:grid;place-items:center}
+.dlg-img img{width:100%;height:auto}
+.dlg-body{padding:2rem;display:flex;flex-direction:column;gap:1.1rem}
+.dlg-top{display:flex;justify-content:space-between;gap:1rem;align-items:start}
+.dlg-body h3{font-size:1.6rem;font-weight:900}
+.dlg-nav{display:flex;gap:.5rem;margin-top:auto;flex-wrap:wrap}
+.dlg-nav .btn{flex:1}
+@media (max-width:760px){.dlg{grid-template-columns:1fr}.dlg-img img{max-height:52vh;width:auto}}
+
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:.75rem 1.2rem;border-radius:999px;font-weight:700;font-size:.9rem;z-index:95;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"></div>
+
+<header class="site" id="siteHeader">
+  <div class="bar">
+    <a class="brand" href="#accueil" aria-label="Mon Terrain en Côte d'Ivoire, accueil">
+      <img src="images/logo.png" alt="" width="44" height="44">
+      <span><b>MON TERRAIN</b><small>EN CÔTE D'IVOIRE</small></span>
+    </a>
+    <nav class="main" id="mainNav">
+      <a href="#localites">Localités</a>
+      <a href="#terrains">Terrains</a>
+      <a href="#simulateur">Simulateur</a>
+      <a href="#documents">Documents</a>
+      <a href="#demarche">Démarche</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="bar-actions">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Changer de thème">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn" id="favBtn" type="button" aria-label="Voir mes favoris">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.3 4.5 7 4.5c2 0 3.3 1 5 3 1.7-2 3-3 5-3 3.7 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>
+        <span class="count" id="favCount" hidden>0</span>
+      </button>
+      <button class="icon-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mainNav" aria-label="Ouvrir le menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <a class="btn btn-primary" href="https://wa.me/2250749479358" target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+        <span class="btn-wa-label">WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="accueil">
+  <section class="hero">
+    <canvas id="plots" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div>
+        <span class="pill"><i></i>14 terrains disponibles · octobre 2026</span>
+        <h1><span class="line">Votre terrain,</span><span class="line o">en toute sécurité.</span></h1>
+        <p class="lead"><b>ACD, titre foncier ou approbation.</b> Chaque vente est signée chez le notaire. Des lots de 400 m² aux grandes surfaces de 10 hectares, d'Abidjan à Yamoussoukro.</p>
+        <form class="search" id="finder" aria-label="Rechercher un terrain">
+          <div class="f"><label for="fZone">Localité</label><select id="fZone"><option value="">Toutes</option></select></div>
+          <div class="f"><label for="fType">Type</label>
+            <select id="fType"><option value="">Lots et surfaces</option><option value="lot">Lots</option><option value="surface">Grandes surfaces</option></select></div>
+          <div class="f"><label for="fBudget">Budget</label>
+            <select id="fBudget"><option value="">Tous budgets</option><option value="0-15000000">Moins de 15 M</option><option value="15000000-30000000">15 à 30 M</option><option value="30000000-500000000">30 à 500 M</option><option value="500000000-1e13">Plus de 500 M</option></select></div>
+          <button class="btn btn-primary" type="submit">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>Rechercher</button>
+        </form>
+        <div class="trust">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Signature chez le notaire</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>Document annoncé sur chaque fiche</span>
+        </div>
+      </div>
+      <div class="deck" id="deck" aria-label="Fiches de terrains à la une">
+        <div class="float f1"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span><span>À partir de<b>5 500 000 FCFA</b></span></div>
+        <div class="float f2"><span class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 21h18M5 21V10l7-6 7 6v11"/></svg></span><span>Jusqu'à<b>10 hectares</b></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-label="Localités où se trouvent nos terrains"><div class="track" id="marquee"></div></div>
+
+  <section class="zones-sec" id="localites" aria-labelledby="zcTitle">
+    <div class="wrap zc-head">
+      <div><span class="kicker">Nos localités</span><h2 id="zcTitle">Où se trouvent nos terrains</h2></div>
+      <div class="zc-nav">
+        <button type="button" id="zcPrev" aria-label="Localité précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <button type="button" id="zcNext" aria-label="Localité suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <div class="zc-wrap"><div class="zc" id="zc" tabindex="0" aria-label="Localités, faites défiler"></div></div>
+  </section>
+
+  <section class="block" id="pourquoi">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="kicker">Immobilier sécurisé &amp; foncier</span><h2>Acheter un terrain sans mauvaise surprise</h2></div>
+        <p>Nous vendons des terrains dont le document est connu à l'avance. Vous visitez, vous vérifiez, puis vous signez chez le notaire.</p>
+      </div>
+      <div class="bento">
+        <div class="tile dark t-wide reveal">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>
+          <div><h3>100 % des ventes chez le notaire</h3><p>Aucun paiement de la main à la main. L'acte et le paiement passent par l'étude notariale.</p></div>
+          <span class="plots" aria-hidden="true"></span>
+        </div>
+        <div class="tile photo reveal">
+          <img src="images/vitre1.jpg" alt="Terrain de 1 097 m² à Vitré 1, en bordure de grande voie" loading="lazy">
+          <div class="cap"><h3>Terrains réels, photos réelles</h3><p>Vitré 1 · 1 097 m² en bordure de grande voie</p></div>
+        </div>
+        <div class="tile orange reveal"><span class="big">244</span><div><h3>lots disponibles</h3><p>répartis sur 8 offres de lots</p></div></div>
+        <div class="tile reveal"><span class="big">9</span><div><h3>localités</h3><p>Abidjan, Grand Abidjan, littoral et Yamoussoukro</p></div></div>
+        <div class="tile reveal"><span class="big">5</span><div><h3>types de documents</h3><p>ACD, TF, approbation, certificat foncier, attestation</p></div></div>
+        <div class="tile t-wide reveal">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-6 7 6v11"/><path d="M10 21v-6h4v6"/></svg></span>
+          <div><h3>Pour tous les projets</h3><p>Un premier lot à 5 500 000 FCFA à Yamoussoukro, un terrain pour votre maison à Bingerville, ou 10 hectares à Eloka pour un programme immobilier.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="terrains" style="padding-top:1rem">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="kicker">Catalogue</span><h2>Nos terrains disponibles</h2></div>
+        <p>Filtrez par type, document ou budget. Touchez le cœur pour garder un terrain en favori.</p>
+      </div>
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Type de terrain">
+          <button type="button" data-type="" aria-pressed="true">Tout</button>
+          <button type="button" data-type="lot" aria-pressed="false">Lots</button>
+          <button type="button" data-type="surface" aria-pressed="false">Grandes surfaces</button>
+          <button type="button" data-type="fav" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.3 4.5 7 4.5c2 0 3.3 1 5 3 1.7-2 3-3 5-3 3.7 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>Favoris</button>
+        </div>
+        <div class="tb-right">
+          <label class="sr" for="fDoc" hidden>Document</label>
+          <select id="fDoc" aria-label="Document">
+            <option value="">Tous documents</option><option value="ACD">ACD</option><option value="TF">Titre foncier</option><option value="Approbation">Approbation</option><option value="Certificat foncier">Certificat foncier</option><option value="Attestation">Attestation</option>
+          </select>
+          <select id="fSort" aria-label="Trier">
+            <option value="">Recommandés</option><option value="asc">Prix total croissant</option><option value="desc">Prix total décroissant</option><option value="surf">Plus grande surface</option>
+          </select>
+        </div>
+      </div>
+      <p class="result-line" id="resultLine" aria-live="polite"></p>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="block" id="simulateur" style="padding-top:2rem">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="kicker">Simulateur</span><h2>Estimez votre budget</h2></div>
+        <p>Choisissez un terrain et la surface ou le nombre de lots. Le calcul utilise les prix affichés sur nos fiches.</p>
+      </div>
+      <div class="sim reveal">
+        <div class="sim-panel">
+          <div><label for="sTerrain">Terrain</label><select id="sTerrain"></select></div>
+          <div id="sQtyWrap">
+            <label for="sQty" id="sQtyLbl">Surface souhaitée</label>
+            <div class="range-row"><input type="range" id="sQty"><output id="sQtyOut" for="sQty"></output></div>
+          </div>
+          <div><label for="sFees">Frais de notaire et de mutation estimés</label>
+            <div class="range-row"><input type="range" id="sFees" min="0" max="15" step="0.5" value="10"><output id="sFeesOut" for="sFees">10 %</output></div>
+          </div>
+        </div>
+        <div class="sim-out">
+          <span class="plots" aria-hidden="true"></span>
+          <div><p class="lbl">Prix du terrain</p><p class="amount" id="sAmount">–</p><p class="detail" id="sDetail"></p></div>
+          <dl>
+            <dt>Prix du terrain</dt><dd id="sPrice">–</dd>
+            <dt>Frais estimés</dt><dd id="sFeesAmt">–</dd>
+            <dt>Budget total estimé</dt><dd id="sTotal" style="color:var(--orange)">–</dd>
+          </dl>
+          <p class="sim-note">Estimation indicative. Le taux réel des frais est communiqué par le notaire. La surface minimale vendue sur une grande surface est à confirmer avec nous.</p>
+          <a class="btn btn-primary" id="sWa" href="#" target="_blank" rel="noopener" style="align-self:flex-start">Recevoir une offre sur WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="documents" style="padding-top:2rem">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="kicker">Sécurité foncière</span><h2>Le document de chaque terrain est connu</h2></div>
+        <p>Cliquez sur un document pour voir les terrains qui l'ont.</p>
+      </div>
+      <div class="docs" id="docGrid"></div>
+    </div>
+  </section>
+
+  <section class="block process" id="demarche">
+    <div class="wrap">
+      <div class="head reveal">
+        <div><span class="kicker">Démarche</span><h2>Du premier message à la signature</h2></div>
+        <p>Quatre étapes, dans cet ordre, pour chaque achat.</p>
+      </div>
+      <ol class="steps">
+        <li class="reveal"><h3>Vous nous écrivez</h3><p>Sur WhatsApp, indiquez la localité, la surface et votre budget. Nous envoyons les fiches qui correspondent.</p></li>
+        <li class="reveal"><h3>Visite du terrain</h3><p>Nous organisons la visite sur site pour voir le lot, l'accès et les voies.</p></li>
+        <li class="reveal"><h3>Vérification du document</h3><p>Vous consultez l'ACD, le titre foncier, l'approbation ou l'attestation du terrain.</p></li>
+        <li class="reveal"><h3>Signature chez le notaire</h3><p>La vente est signée devant notaire. Le paiement et l'acte sont sécurisés.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="block" id="faq">
+    <div class="wrap faq-wrap">
+      <div class="reveal"><span class="kicker">Questions fréquentes</span><h2 style="font-weight:900;font-size:clamp(2rem,4.4vw,3.3rem);margin-top:.7rem">Vos questions avant d'acheter</h2></div>
+      <div class="faq">
+        <details open><summary>Qu'est-ce que l'ACD ?</summary><p>L'Arrêté de Concession Définitive est l'acte par lequel l'État attribue définitivement un terrain à son propriétaire. C'est le document de référence en Côte d'Ivoire. Le document de chaque terrain est indiqué sur sa fiche.</p></details>
+        <details><summary>Où se signe la vente ?</summary><p>Toutes nos ventes sont signées chez le notaire. Le paiement passe par l'étude notariale, jamais de la main à la main.</p></details>
+        <details><summary>Comment visiter un terrain ?</summary><p>Écrivez-nous sur WhatsApp au +225 07 49 47 93 58 avec le nom du terrain. Nous fixons ensemble une date de visite sur site.</p></details>
+        <details><summary>Puis-je acheter plusieurs lots ?</summary><p>Oui, quand plusieurs lots sont disponibles. À Jacqueville, par exemple, 2 lots de 600 m² collés sont en vente. À Yamoussoukro, 100 lots sont disponibles.</p></details>
+        <details><summary>J'habite à l'étranger, comment faire ?</summary><p>Contactez-nous sur WhatsApp. Nous vous envoyons les fiches, les photos et les informations sur le document du terrain, puis nous organisons la suite avec vous et le notaire.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="contact" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta reveal">
+        <span class="plots" aria-hidden="true"></span>
+        <div>
+          <span class="kicker" style="color:#4a2c08">Contact</span>
+          <h2 style="margin-top:.7rem">Parlons de votre futur terrain</h2>
+          <p>Écrivez-nous sur WhatsApp. Nous répondons avec les fiches, les photos et le document du terrain qui vous intéresse.</p>
+          <div class="phone-row"><span class="phone" id="phone">+225 07 49 47 93 58</span><button class="copy" type="button" id="copyBtn">Copier le numéro</button></div>
+        </div>
+        <form class="form" id="contactForm">
+          <div><label for="cName">Nom complet</label><input id="cName" required placeholder="Ex. Kouassi Aya" autocomplete="name"></div>
+          <div><label for="cTel">Téléphone</label><input id="cTel" type="tel" placeholder="+225 …" autocomplete="tel"></div>
+          <div class="full"><label for="cTerrain">Terrain qui vous intéresse</label><select id="cTerrain"><option value="">Conseillez-moi</option></select></div>
+          <div class="full"><label for="cMsg">Message</label><textarea id="cMsg" placeholder="Budget, surface souhaitée, date de visite…"></textarea></div>
+          <div class="full"><button class="btn btn-dark" type="submit">Préparer mon message WhatsApp</button></div>
+          <p class="note full" id="formNote">Le message s'ouvre dans WhatsApp. Vous l'envoyez vous-même.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="brand" href="#accueil"><img src="images/logo.png" alt="" width="44" height="44"><span><b>MON TERRAIN</b><small>EN CÔTE D'IVOIRE</small></span></a>
+        <p style="margin-top:1rem;max-width:30em">Immobilier sécurisé &amp; foncier. Terrains à vendre avec ACD, titre foncier ou approbation. Signature chez le notaire.</p>
+      </div>
+      <div><h4>Localités</h4><ul id="footZones"></ul></div>
+      <div><h4>Contact</h4><ul><li>WhatsApp : +225 07 49 47 93 58</li><li><a href="https://wa.me/2250749479358" target="_blank" rel="noopener">Écrire sur WhatsApp</a></li><li><a href="#terrains">Voir les terrains</a></li><li><a href="#faq">Questions fréquentes</a></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Mon Terrain en Côte d'Ivoire</span><span>Prix en FCFA, sous réserve de disponibilité.</span></div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/2250749479358" target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp au +225 07 49 47 93 58">
+  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+</a>
+
+<nav class="dock" aria-label="Actions rapides">
+  <a href="#terrains"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Terrains</a>
+  <button type="button" id="dockFav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.3 4.5 7 4.5c2 0 3.3 1 5 3 1.7-2 3-3 5-3 3.7 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>Favoris</button>
+  <a class="wa" href="https://wa.me/2250749479358" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>WhatsApp</a>
+</nav>
+
+<dialog id="fiche" aria-labelledby="dTitle">
+  <div class="dlg">
+    <div class="dlg-img"><img id="dImg" src="" alt=""></div>
+    <div class="dlg-body">
+      <div class="dlg-top"><div><span class="kicker" id="dZone"></span><h3 id="dTitle" style="margin-top:.5rem"></h3></div>
+        <button class="icon-btn" type="button" id="dClose" aria-label="Fermer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+      <div class="price" id="dPrice"></div>
+      <div class="specs" id="dSpecs"></div>
+      <ul class="checks" id="dChecks"></ul>
+      <div class="dlg-nav">
+        <a class="btn btn-primary" id="dWa" href="#" target="_blank" rel="noopener">Ce terrain m'intéresse</a>
+      </div>
+      <div class="dlg-nav">
+        <button class="btn btn-soft" type="button" id="dPrev">← Précédent</button>
+        <button class="btn btn-soft" type="button" id="dNext">Suivant →</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const WA = "2250749479358";
+// Données reprises des fiches officielles (octobre 2026)
+const TERRAINS = [
+  {id:"yamoussoukro", zone:"Yamoussoukro", lieu:"Yamoussoukro", titre:"Lots de 500 m² près de l'aéroport", type:"lot", m2:500, prix:5500000, unite:"lot", doc:"Certificat foncier", points:["100 lots disponibles","Près de l'extension de l'aéroport","Idéal premier investissement"], lots:100},
+  {id:"jacqueville", zone:"Jacqueville", lieu:"Jacqueville", titre:"2 lots de 600 m² collés", type:"lot", m2:600, prix:11000000, unite:"lot", doc:"TF + ACD", points:["Lotissement Terre Promise","En bordure de la Y4","À 1 km de la mer"], lots:2},
+  {id:"vitre2-betigbo-tf", zone:"Vitré", lieu:"Vitré 2 · Îles Betigbo", titre:"Lot de 500 m² avec TF créé", type:"lot", m2:500, prix:11000000, unite:"", doc:"ACD introduite · TF créé", points:["1 seul lot disponible","Titre foncier déjà créé","Signature chez le notaire"], lots:1},
+  {id:"anyama-adjame", zone:"Anyama", lieu:"Anyama Adjamé", titre:"Lots de 400 m² en bordure de Y4", type:"lot", m2:400, prix:12100000, unite:"lot", doc:"ACD", points:["20 lots déjà morcelés","En bordure de la Y4","ACD disponible"], lots:20},
+  {id:"assini-koko-manzan", zone:"Assini", lieu:"Assini · Koko Manzan", titre:"Lots de 500 m² au bord de l'eau", type:"lot", m2:500, prix:16500000, unite:"lot", doc:"Approbation", points:["50 lots disponibles","Après la lagune, en bordure d'eau","Lotissement approuvé"], lots:50},
+  {id:"vitre2-betigbo", zone:"Vitré", lieu:"Vitré 2 · Îles Betigbo", titre:"Lots de 500 m² disponibles", type:"lot", m2:500, prix:16500000, unite:"lot", doc:"Approbation", points:["50 lots disponibles","Lotissement approuvé","Signature chez le notaire"], lots:50},
+  {id:"bingerville-barque", zone:"Bingerville", lieu:"Bingerville · Route du Barque", titre:"Lots de 400 m² à Bingerville", type:"lot", m2:400, prix:16500000, unite:"lot", doc:"ACD", points:["20 lots disponibles","Route du Barque","ACD disponible"], lots:20},
+  {id:"vitre1", zone:"Vitré", lieu:"Vitré 1", titre:"1 097 m² en bordure de grande voie", type:"lot", m2:1097, prix:27500000, unite:"", doc:"Attestation", points:["Lot unique de 1 097 m²","En bordure de grande voie","Idéal commerce ou résidence"], lots:1},
+  {id:"km22-autoroute", zone:"Autoroute du Nord", lieu:"Km 22 · Autoroute du Nord", titre:"5 000 m² à 1 km de l'autoroute", type:"surface", m2:5000, prix:55000, unite:"m²", doc:"ACD", points:["Surface : 5 000 m²","À 1 km de l'autoroute du Nord","Idéal projet immobilier"]},
+  {id:"songon-kassemble", zone:"Songon", lieu:"Songon Kassemblé", titre:"1 hectare après les logements sociaux", type:"surface", m2:10000, prix:33000, unite:"m²", doc:"ACD", points:["Surface : 1 hectare","Après les logements sociaux","Idéal promoteur ou lotisseur"]},
+  {id:"songon-ile-de-paques", zone:"Songon", lieu:"Songon · Île de Pâques", titre:"1 hectare avec vue sur le lac", type:"surface", m2:10000, prix:38500, unite:"m²", doc:"ACD", points:["Surface : 1 hectare","Vue sur le lac Labion","Accès par Abrebis"]},
+  {id:"cocody-djorogobite2", zone:"Cocody", lieu:"Cocody · Djorogobité 2", titre:"6 hectares en bordure de Y4", type:"surface", m2:60000, prix:121000, unite:"m²", doc:"ACD", points:["Surface : 6 hectares","Djorogobité 2 extension, bordure Y4","Pour promoteurs et investisseurs"]},
+  {id:"bingerville-eloka", zone:"Bingerville", lieu:"Bingerville · Eloka", titre:"10 hectares entre voie express et Y4", type:"surface", m2:100000, prix:38500, unite:"m²", doc:"ACD", points:["Surface : 10 hectares","Entre la voie express et la Y4","Pour promoteurs et investisseurs"]},
+  {id:"vitre2-iles-taki", zone:"Vitré", lieu:"Vitré 2 · Îles Taki", titre:"6 hectares à Vitré 2", type:"surface", m2:60000, prix:66000, unite:"m²", doc:"Approbation", points:["Surface : 6 hectares","Lotissement approuvé","Pour promoteurs et investisseurs"]}
+];
+const DOCS = [
+  {abbr:"ACD", nom:"Arrêté de Concession Définitive", txt:"Acte de l'État qui attribue définitivement le terrain. Le document de référence en Côte d'Ivoire.", key:"ACD"},
+  {abbr:"TF", nom:"Titre foncier", txt:"Le terrain est immatriculé au livre foncier. Chaque mutation y est inscrite.", key:"TF"},
+  {abbr:"Appro.", nom:"Lotissement approuvé", txt:"Le plan de lotissement a reçu l'approbation administrative.", key:"Approbation"},
+  {abbr:"CF", nom:"Certificat foncier", txt:"Constate les droits sur une terre rurale. Étape vers le titre foncier.", key:"Certificat foncier"},
+  {abbr:"Att.", nom:"Attestation", txt:"Attestation remise pour le lot, vérifiée avant la signature chez le notaire.", key:"Attestation"}
+];
+
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString("fr-FR").replace(/[  ,]/g," ");
+const totalOf = t => t.unite === "m²" ? t.prix * t.m2 : t.prix;
+const big = n => n >= 1e9 ? (n/1e9).toLocaleString("fr-FR",{maximumFractionDigits:2}) + " milliards" : fmt(n);
+const surf = m => m >= 10000 ? fmt(m/10000) + " ha" : fmt(m) + " m²";
+const unitOf = t => t.unite ? "FCFA / " + t.unite : "FCFA";
+const waLink = msg => "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pin = '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
+const heart = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.3 4.5 7 4.5c2 0 3.3 1 5 3 1.7-2 3-3 5-3 3.7 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>';
+const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(_){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
+const toast = msg => { const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove("show"),1800); };
+const interestMsg = t => `Bonjour, je suis intéressé(e) par le terrain « ${t.titre} » à ${t.lieu} (${fmt(t.prix)} ${unitOf(t)}). Est-il toujours disponible ?`;
+
+let favs = new Set(store.get("mt-favs", []));
+const state = {zone:"", type:"", doc:"", budget:"", sort:""};
+
+/* ---------- catalogue ---------- */
+function card(t){
+  const tot = t.unite === "m²" ? `<span class="total">Soit ${big(totalOf(t))} FCFA pour ${surf(t.m2)}</span>` : "";
+  const avail = t.lots ? (t.lots === 1 ? "1 lot" : t.lots + " lots") : "Bloc entier";
+  return `<article class="card" style="--vt:c-${t.id}">
+    <div class="media">
+      <img src="images/${t.id}.jpg" alt="" loading="lazy" width="960" height="323">
+      <button class="open" type="button" data-open="${t.id}" aria-label="Voir la fiche : ${esc(t.lieu)}"></button>
+      <div class="badges"><span class="badge o">${t.type === "lot" ? "Lot" : "Grande surface"}</span>${t.lots === 1 ? '<span class="badge hot">Dernier lot</span>' : ""}</div>
+      <button class="fav" type="button" data-fav="${t.id}" aria-pressed="${favs.has(t.id)}" aria-label="Ajouter ${esc(t.lieu)} aux favoris">${heart}</button>
+      <div class="where"><small>${pin}${esc(t.zone)}</small><b>${esc(t.lieu)}</b></div>
+    </div>
+    <div class="body">
+      <h3>${esc(t.titre)}</h3>
+      <div class="price"><span class="amt">${fmt(t.prix)}</span><span class="unit">${unitOf(t)}</span>${tot}</div>
+      <div class="specs"><div><span>Surface</span><b>${surf(t.m2)}</b></div><div><span>Document</span><b>${esc(t.doc)}</b></div><div><span>Dispo</span><b>${avail}</b></div></div>
+      <ul class="checks">${t.points.slice(1).map(p => `<li>${esc(p)}</li>`).join("")}</ul>
+      <div class="foot">
+        <a class="btn btn-primary" href="${waLink(interestMsg(t))}" target="_blank" rel="noopener">Ce terrain m'intéresse</a>
+        <button class="btn btn-soft" type="button" data-open="${t.id}">Détails</button>
+      </div>
+    </div>
+  </article>`;
+}
+function filtered(){
+  let list = TERRAINS.filter(t =>
+    (!state.zone || t.zone === state.zone) &&
+    (!state.type || (state.type === "fav" ? favs.has(t.id) : t.type === state.type)) &&
+    (!state.doc || t.doc.includes(state.doc)) &&
+    (!state.budget || (() => { const [a,b] = state.budget.split("-").map(Number); const v = totalOf(t); return v >= a && v < b; })()));
+  if (state.sort === "asc") list = [...list].sort((a,b) => totalOf(a) - totalOf(b));
+  if (state.sort === "desc") list = [...list].sort((a,b) => totalOf(b) - totalOf(a));
+  if (state.sort === "surf") list = [...list].sort((a,b) => b.m2 - a.m2);
+  return list;
+}
+let current = [];
+function paint(){
+  current = filtered();
+  $("grid").innerHTML = current.length ? current.map(card).join("") :
+    `<div class="empty"><strong>${state.type === "fav" ? "Aucun favori pour l'instant." : "Aucun terrain ne correspond à ces critères."}</strong><span>${state.type === "fav" ? "Touchez le cœur sur un terrain pour le retrouver ici." : "Élargissez la recherche, ou écrivez-nous : d'autres lots peuvent se libérer."}</span><button class="btn btn-soft" type="button" id="resetAll">Afficher tous les terrains</button></div>`;
+  const tags = [state.zone, state.type === "lot" ? "Lots" : state.type === "surface" ? "Grandes surfaces" : state.type === "fav" ? "Favoris" : "", state.doc, state.budget ? $("fBudget").selectedOptions[0].text : ""].filter(Boolean);
+  $("resultLine").textContent = `${current.length} terrain${current.length > 1 ? "s" : ""}` + (tags.length ? " · " + tags.join(" · ") : " disponibles");
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.type === state.type)));
+  $("fZone").value = state.zone; $("fDoc").value = state.doc; $("fBudget").value = state.budget; $("fSort").value = state.sort;
+  $("fType").value = state.type === "fav" ? "" : state.type;
+  const r = $("resetAll"); if (r) r.onclick = () => { Object.assign(state,{zone:"",type:"",doc:"",budget:"",sort:""}); render(); };
+}
+const render = () => document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches ? document.startViewTransition(paint) : paint();
+
+function updateFavCount(){ const n = favs.size; $("favCount").hidden = !n; $("favCount").textContent = n; }
+function toggleFav(id){
+  favs.has(id) ? favs.delete(id) : favs.add(id);
+  store.set("mt-favs", [...favs]); updateFavCount();
+  document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => b.setAttribute("aria-pressed", String(favs.has(id))));
+  toast(favs.has(id) ? "Ajouté aux favoris" : "Retiré des favoris");
+  if (state.type === "fav") render();
+}
+$("grid").addEventListener("click", e => {
+  const f = e.target.closest("[data-fav]"); if (f) return toggleFav(f.dataset.fav);
+  const o = e.target.closest("[data-open]"); if (o) openFiche(o.dataset.open);
+});
+
+/* ---------- selects & filters ---------- */
+const zones = [...new Set(TERRAINS.map(t => t.zone))];
+$("fZone").insertAdjacentHTML("beforeend", zones.map(z => `<option value="${esc(z)}">${esc(z)}</option>`).join(""));
+$("cTerrain").insertAdjacentHTML("beforeend", TERRAINS.map(t => `<option value="${t.id}">${esc(t.lieu)} · ${esc(t.titre)}</option>`).join(""));
+$("footZones").innerHTML = zones.map(z => `<li><a href="#terrains" data-zone="${esc(z)}">${esc(z)}</a></li>`).join("");
+/* ---------- localités : bandeau + carrousel ---------- */
+const ZONE_IMG = {"Yamoussoukro":"yamoussoukro","Jacqueville":"jacqueville","Vitré":"vitre1","Anyama":"anyama-adjame","Assini":"assini-koko-manzan","Bingerville":"bingerville-barque","Autoroute du Nord":"km22-autoroute","Songon":"songon-ile-de-paques","Cocody":"cocody-djorogobite2"};
+const zoneInfo = zones.map(z => {
+  const list = TERRAINS.filter(t => t.zone === z), lots = list.filter(t => t.type === "lot"), surfs = list.filter(t => t.type === "surface");
+  const from = lots.length ? (() => { const m = lots.reduce((a,b) => a.prix <= b.prix ? a : b); return `${fmt(m.prix)} ${unitOf(m)}`; })()
+                           : (() => { const m = surfs.reduce((a,b) => a.prix <= b.prix ? a : b); return `${fmt(m.prix)} FCFA / m²`; })();
+  const places = [...new Set(list.map(t => t.lieu.includes("·") ? t.lieu.split("·")[1].trim() : t.lieu))];
+  return {z, n:list.length, from, places, img: ZONE_IMG[z] || list[0].id};
+});
+const mItem = (i, hide) => `<span class="item"${hide ? ' aria-hidden="true"' : ""}><button type="button" data-zone="${esc(i.z)}"${hide ? ' tabindex="-1"' : ""}>${esc(i.z)}<small>${i.n} terrain${i.n > 1 ? "s" : ""}</small></button></span>`;
+$("marquee").innerHTML = zoneInfo.map(i => mItem(i)).join("") + zoneInfo.map(i => mItem(i, true)).join("");
+$("zc").innerHTML = zoneInfo.map(i => `<button class="zcard" type="button" data-zone="${esc(i.z)}">
+  <span class="zimg"><img src="images/${i.img}.jpg" alt="" loading="lazy"><span class="zcount">${i.n} terrain${i.n > 1 ? "s" : ""}</span><span class="zname">${esc(i.z)}</span></span>
+  <span class="zbody"><span class="zplaces">${i.places.map(p => `<span>${esc(p)}</span>`).join("")}</span>
+  <span class="zfrom">À partir de<b>${i.from}</b></span><span class="zgo">Voir les terrains →</span></span></button>`).join("");
+const goZone = z => { Object.assign(state, {zone:z, type:"", doc:"", budget:""}); render(); $("terrains").scrollIntoView(); };
+[$("marquee"), $("zc")].forEach(el => el.addEventListener("click", e => { const b = e.target.closest("[data-zone]"); if (b) goZone(b.dataset.zone); }));
+// défilement automatique du carrousel
+const zc = $("zc");
+const zStep = () => (zc.querySelector(".zcard")?.offsetWidth || 300) + 16;
+const zMove = d => {
+  const max = zc.scrollWidth - zc.clientWidth;
+  if (d > 0 && zc.scrollLeft >= max - 4) zc.scrollTo({left:0, behavior:"smooth"});
+  else if (d < 0 && zc.scrollLeft <= 4) zc.scrollTo({left:max, behavior:"smooth"});
+  else zc.scrollBy({left:d * zStep(), behavior:"smooth"});
+};
+$("zcPrev").onclick = () => zMove(-1); $("zcNext").onclick = () => zMove(1);
+let zPaused = false;
+["mouseenter","touchstart","focusin"].forEach(ev => zc.addEventListener(ev, () => zPaused = true, {passive:true}));
+["mouseleave","focusout"].forEach(ev => zc.addEventListener(ev, () => zPaused = false));
+zc.addEventListener("touchend", () => setTimeout(() => zPaused = false, 4000), {passive:true});
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(() => { if (!zPaused && !document.hidden) zMove(1); }, 3000);
+$("finder").addEventListener("submit", e => {
+  e.preventDefault();
+  Object.assign(state, {zone:$("fZone").value, type:$("fType").value, budget:$("fBudget").value});
+  render(); $("terrains").scrollIntoView();
+});
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.type = b.dataset.type; render(); }));
+$("fDoc").addEventListener("change", e => { state.doc = e.target.value; render(); });
+$("fSort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+$("footZones").addEventListener("click", e => { const a = e.target.closest("[data-zone]"); if (a) { Object.assign(state,{zone:a.dataset.zone,type:"",doc:"",budget:""}); render(); } });
+const showFavs = () => { state.type = "fav"; render(); $("terrains").scrollIntoView(); };
+$("favBtn").addEventListener("click", showFavs);
+$("dockFav").addEventListener("click", showFavs);
+
+/* ---------- documents ---------- */
+$("docGrid").innerHTML = DOCS.map(d => {
+  const n = TERRAINS.filter(t => t.doc.includes(d.key)).length;
+  return `<button class="doc reveal" type="button" data-doc="${esc(d.key)}"><span class="abbr">${d.abbr}</span><h3>${d.nom}</h3><p>${d.txt}</p><span class="n"><span>${n} terrain${n > 1 ? "s" : ""}</span><span>Voir →</span></span></button>`;
+}).join("");
+$("docGrid").addEventListener("click", e => { const b = e.target.closest("[data-doc]"); if (!b) return; Object.assign(state,{doc:b.dataset.doc,type:"",zone:"",budget:""}); render(); $("terrains").scrollIntoView(); });
+
+/* ---------- fiche (dialog) ---------- */
+const dlg = $("fiche"); let dIndex = 0;
+function fillFiche(t){
+  $("dImg").src = "images/fiche-" + t.id + ".jpg";
+  $("dImg").alt = `Fiche officielle : ${t.lieu}, ${t.titre}, ${fmt(t.prix)} ${unitOf(t)}, document ${t.doc}`;
+  $("dZone").textContent = t.lieu;
+  $("dTitle").textContent = t.titre;
+  $("dPrice").innerHTML = `<span class="amt">${fmt(t.prix)}</span><span class="unit">${unitOf(t)}</span>` + (t.unite === "m²" ? `<span class="total">Soit ${big(totalOf(t))} FCFA pour ${surf(t.m2)}</span>` : "");
+  $("dSpecs").innerHTML = `<div><span>Surface</span><b>${surf(t.m2)}</b></div><div><span>Document</span><b>${esc(t.doc)}</b></div><div><span>Dispo</span><b>${t.lots ? t.lots + (t.lots > 1 ? " lots" : " lot") : "Bloc entier"}</b></div>`;
+  $("dChecks").innerHTML = t.points.map(p => `<li>${esc(p)}</li>`).join("") + "<li>Vente sécurisée chez le notaire</li>";
+  $("dWa").href = waLink(interestMsg(t));
+}
+function openFiche(id){
+  const list = current.length ? current : TERRAINS;
+  dIndex = Math.max(0, list.findIndex(t => t.id === id));
+  fillFiche(list[dIndex] || TERRAINS.find(t => t.id === id));
+  if (!dlg.open) dlg.showModal ? dlg.showModal() : dlg.setAttribute("open","");
+}
+const step = d => { const list = current.length ? current : TERRAINS; dIndex = (dIndex + d + list.length) % list.length; fillFiche(list[dIndex]); };
+$("dPrev").onclick = () => step(-1); $("dNext").onclick = () => step(1);
+$("dClose").onclick = () => dlg.close();
+dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+dlg.addEventListener("keydown", e => { if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1); });
+let tx = null;
+dlg.addEventListener("touchstart", e => tx = e.touches[0].clientX, {passive:true});
+dlg.addEventListener("touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1); tx = null; });
+
+/* ---------- hero deck ---------- */
+const DECK = ["cocody-djorogobite2","jacqueville","yamoussoukro","songon-ile-de-paques","vitre1"];
+const deck = $("deck");
+deck.insertAdjacentHTML("beforeend", DECK.map(id => { const t = TERRAINS.find(x => x.id === id); return `<button type="button" data-open="${id}" aria-label="Voir la fiche : ${esc(t.lieu)}"><img src="images/fiche-${id}.jpg" alt=""></button>`; }).join(""));
+const cards = [...deck.querySelectorAll("button")];
+let deckTop = 0;
+function layoutDeck(){
+  cards.forEach((c,i) => {
+    const k = (i - deckTop + cards.length) % cards.length;
+    const pos = [[0,0,0,1],[64,-14,8,.92],[-64,-14,-8,.92],[110,-28,14,.84],[-110,-28,-14,.84]][k];
+    c.style.transform = `translate(-50%,-50%) translateX(${pos[0]}px) translateY(${pos[1]}px) rotate(${pos[2]}deg) scale(${pos[3]})`;
+    c.style.zIndex = 10 - k;
+    c.style.filter = k ? `brightness(${1 - k*.1})` : "none";
+    c.tabIndex = k ? -1 : 0;
+  });
+}
+layoutDeck();
+deck.addEventListener("click", e => { const b = e.target.closest("[data-open]"); if (b) openFiche(b.dataset.open); });
+let deckTimer = matchMedia("(prefers-reduced-motion: reduce)").matches ? null : setInterval(() => { deckTop = (deckTop + 1) % cards.length; layoutDeck(); }, 3600);
+deck.addEventListener("mouseenter", () => clearInterval(deckTimer));
+
+/* ---------- hero canvas: parcel grid ---------- */
+(() => {
+  const cv = $("plots"), ctx = cv.getContext("2d");
+  let w, h, cells = [], t0 = performance.now();
+  const S = 64;
+  function size(){
+    const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    w = r.width; h = r.height; cv.width = w*dpr; cv.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    cells = [];
+    for (let y = 0; y < h/S + 1; y++) for (let x = 0; x < w/S + 1; x++) cells.push({x, y, p: Math.random()*Math.PI*2, hot: Math.random() < .035});
+  }
+  function draw(now){
+    const t = (now - t0) / 1000;
+    ctx.clearRect(0,0,w,h);
+    for (const c of cells){
+      const a = .05 + .04*Math.sin(t*.6 + c.p);
+      ctx.fillStyle = `rgba(110,190,130,${a})`;
+      ctx.beginPath(); ctx.roundRect(c.x*S + 4, c.y*S + 4, S - 8, S - 8, 6); ctx.fill();
+      if (c.hot){
+        ctx.strokeStyle = `rgba(238,138,38,${.35 + .3*Math.sin(t*1.2 + c.p)})`;
+        ctx.setLineDash([6,5]); ctx.lineWidth = 1.5;
+        ctx.strokeRect(c.x*S + 4, c.y*S + 4, S - 8, S - 8); ctx.setLineDash([]);
+      }
+    }
+    // route
+    ctx.strokeStyle = "rgba(238,138,38,.18)"; ctx.lineWidth = 18;
+    ctx.beginPath(); ctx.moveTo(0, h*.82); ctx.lineTo(w, h*.38); ctx.stroke();
+    ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5; ctx.setLineDash([14,12]); ctx.lineDashOffset = -t*20;
+    ctx.beginPath(); ctx.moveTo(0, h*.82); ctx.lineTo(w, h*.38); ctx.stroke(); ctx.setLineDash([]);
+    if (!reduce) requestAnimationFrame(draw);
+  }
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  size(); addEventListener("resize", size); requestAnimationFrame(draw);
+})();
+
+/* ---------- simulateur ---------- */
+$("sTerrain").innerHTML = TERRAINS.map(t => `<option value="${t.id}">${esc(t.lieu)} · ${fmt(t.prix)} ${unitOf(t)}</option>`).join("");
+$("sTerrain").value = "km22-autoroute";
+function setupQty(){
+  const t = TERRAINS.find(x => x.id === $("sTerrain").value), q = $("sQty");
+  if (t.unite === "m²"){ $("sQtyLbl").textContent = "Surface souhaitée (m²)"; q.min = 500; q.max = t.m2; q.step = 100; q.value = Math.min(1000, t.m2); }
+  else { $("sQtyLbl").textContent = "Nombre de lots"; q.min = 1; q.max = t.lots || 1; q.step = 1; q.value = 1; }
+  $("sQtyWrap").hidden = t.unite !== "m²" && (t.lots || 1) === 1;
+  calc();
+}
+function calc(){
+  const t = TERRAINS.find(x => x.id === $("sTerrain").value), q = +$("sQty").value, fees = +$("sFees").value;
+  const price = t.unite === "m²" ? t.prix * q : t.prix * q;
+  const fa = price * fees / 100;
+  $("sQtyOut").textContent = t.unite === "m²" ? fmt(q) + " m²" : q + (q > 1 ? " lots" : " lot");
+  $("sFeesOut").textContent = fees.toLocaleString("fr-FR") + " %";
+  $("sAmount").textContent = big(price) + " FCFA";
+  $("sDetail").textContent = t.unite === "m²" ? `${fmt(q)} m² × ${fmt(t.prix)} FCFA / m² à ${t.lieu}` : `${q} × ${fmt(t.prix)} FCFA à ${t.lieu} (${surf(t.m2)}${q > 1 ? " chacun" : ""})`;
+  $("sPrice").textContent = fmt(price) + " FCFA";
+  $("sFeesAmt").textContent = fmt(fa) + " FCFA";
+  $("sTotal").textContent = fmt(price + fa) + " FCFA";
+  $("sWa").href = waLink(`Bonjour, je souhaite une offre pour ${t.lieu} (${t.titre}) : ${$("sQtyOut").textContent}, soit environ ${fmt(price)} FCFA. Pouvez-vous me rappeler ?`);
+}
+$("sTerrain").addEventListener("change", setupQty);
+$("sQty").addEventListener("input", calc);
+$("sFees").addEventListener("input", calc);
+setupQty();
+
+/* ---------- header, menu, thème ---------- */
+const hdr = $("siteHeader");
+const onScroll = () => hdr.classList.toggle("scrolled", scrollY > 40);
+addEventListener("scroll", onScroll, {passive:true}); onScroll();
+const menuBtn = $("menuBtn"), nav = $("mainNav");
+menuBtn.addEventListener("click", () => { const o = nav.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", String(o)); });
+nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); } });
+const savedTheme = store.get("mt-theme", null);
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+$("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next; store.set("mt-theme", next);
+});
+
+/* ---------- contact ---------- */
+$("copyBtn").addEventListener("click", () => {
+  const num = "+225 07 49 47 93 58";
+  const fallback = () => { const r = document.createRange(); r.selectNodeContents($("phone")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Numéro sélectionné"); };
+  try { navigator.clipboard.writeText(num).then(() => toast("Numéro copié"), fallback); } catch (_) { fallback(); }
+});
+$("contactForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const t = TERRAINS.find(x => x.id === $("cTerrain").value);
+  const msg = [`Bonjour, je m'appelle ${$("cName").value.trim()}.`, t ? `Je suis intéressé(e) par : ${t.lieu}, ${t.titre}.` : "Je cherche un terrain.", $("cMsg").value.trim(), $("cTel").value.trim() ? `Mon numéro : ${$("cTel").value.trim()}` : ""].filter(Boolean).join("\n");
+  const url = waLink(msg);
+  $("formNote").innerHTML = `Votre message est prêt. <a href="${url}" target="_blank" rel="noopener"><b>Ouvrir WhatsApp pour l'envoyer</b></a>. Sinon, écrivez au +225 07 49 47 93 58.`;
+  window.open(url, "_blank", "noopener");
+});
+
+updateFavCount();
+paint();
+</script>
+</body>
+</html>
