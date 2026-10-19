@@ -1,0 +1,24 @@
+{
+  "name": "Mon Terrain en Côte d'Ivoire",
+  "short_name": "Mon Terrain",
+  "description": "Terrains à vendre en Côte d'Ivoire : Cocody, Bingerville, Anyama, Songon, Jacqueville, Assini, Vitré, Yamoussoukro. ACD, titre foncier ou approbation. Signature chez le notaire.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f2e1f",
+  "theme_color": "#0f2e1f",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

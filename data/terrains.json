@@ -1,0 +1,273 @@
+{
+  "mis_a_jour": "2026-10-19",
+  "contact": {
+    "whatsapp": "2250749479358",
+    "affichage": "+225 07 49 47 93 58"
+  },
+  "terrains": [
+    {
+      "id": "yamoussoukro",
+      "zone": "Yamoussoukro",
+      "lieu": "Yamoussoukro",
+      "titre": "Lots de 500 m² près de l'aéroport",
+      "type": "lot",
+      "m2": 500,
+      "prix": 5500000,
+      "unite": "lot",
+      "doc": "Certificat foncier",
+      "points": [
+        "100 lots disponibles",
+        "Près de l'extension de l'aéroport",
+        "Idéal premier investissement"
+      ],
+      "lots": 100
+    },
+    {
+      "id": "jacqueville",
+      "zone": "Jacqueville",
+      "lieu": "Jacqueville",
+      "titre": "2 lots de 600 m² collés",
+      "type": "lot",
+      "m2": 600,
+      "prix": 11000000,
+      "unite": "lot",
+      "doc": "TF + ACD",
+      "points": [
+        "Lotissement Terre Promise",
+        "En bordure de la Y4",
+        "À 1 km de la mer"
+      ],
+      "lots": 2
+    },
+    {
+      "id": "vitre2-betigbo-tf",
+      "zone": "Vitré",
+      "lieu": "Vitré 2 · Îles Betigbo",
+      "titre": "Lot de 500 m² avec TF créé",
+      "type": "lot",
+      "m2": 500,
+      "prix": 11000000,
+      "unite": "",
+      "doc": "ACD introduite · TF créé",
+      "points": [
+        "1 seul lot disponible",
+        "Titre foncier déjà créé",
+        "Signature chez le notaire"
+      ],
+      "lots": 1
+    },
+    {
+      "id": "anyama-adjame",
+      "zone": "Anyama",
+      "lieu": "Anyama Adjamé",
+      "titre": "Lots de 400 m² en bordure de Y4",
+      "type": "lot",
+      "m2": 400,
+      "prix": 12100000,
+      "unite": "lot",
+      "doc": "ACD",
+      "points": [
+        "20 lots déjà morcelés",
+        "En bordure de la Y4",
+        "ACD disponible"
+      ],
+      "lots": 20
+    },
+    {
+      "id": "assini-koko-manzan",
+      "zone": "Assini",
+      "lieu": "Assini · Koko Manzan",
+      "titre": "Lots de 500 m² au bord de l'eau",
+      "type": "lot",
+      "m2": 500,
+      "prix": 16500000,
+      "unite": "lot",
+      "doc": "Approbation",
+      "points": [
+        "50 lots disponibles",
+        "Après la lagune, en bordure d'eau",
+        "Lotissement approuvé"
+      ],
+      "lots": 50
+    },
+    {
+      "id": "vitre2-betigbo",
+      "zone": "Vitré",
+      "lieu": "Vitré 2 · Îles Betigbo",
+      "titre": "Lots de 500 m² disponibles",
+      "type": "lot",
+      "m2": 500,
+      "prix": 16500000,
+      "unite": "lot",
+      "doc": "Approbation",
+      "points": [
+        "50 lots disponibles",
+        "Lotissement approuvé",
+        "Signature chez le notaire"
+      ],
+      "lots": 50
+    },
+    {
+      "id": "bingerville-barque",
+      "zone": "Bingerville",
+      "lieu": "Bingerville · Route du Barque",
+      "titre": "Lots de 400 m² à Bingerville",
+      "type": "lot",
+      "m2": 400,
+      "prix": 16500000,
+      "unite": "lot",
+      "doc": "ACD",
+      "points": [
+        "20 lots disponibles",
+        "Route du Barque",
+        "ACD disponible"
+      ],
+      "lots": 20
+    },
+    {
+      "id": "vitre1",
+      "zone": "Vitré",
+      "lieu": "Vitré 1",
+      "titre": "1 097 m² en bordure de grande voie",
+      "type": "lot",
+      "m2": 1097,
+      "prix": 27500000,
+      "unite": "",
+      "doc": "Attestation",
+      "points": [
+        "Lot unique de 1 097 m²",
+        "En bordure de grande voie",
+        "Idéal commerce ou résidence"
+      ],
+      "lots": 1
+    },
+    {
+      "id": "km22-autoroute",
+      "zone": "Autoroute du Nord",
+      "lieu": "Km 22 · Autoroute du Nord",
+      "titre": "5 000 m² à 1 km de l'autoroute",
+      "type": "surface",
+      "m2": 5000,
+      "prix": 55000,
+      "unite": "m²",
+      "doc": "ACD",
+      "points": [
+        "Surface : 5 000 m²",
+        "À 1 km de l'autoroute du Nord",
+        "Idéal projet immobilier"
+      ]
+    },
+    {
+      "id": "songon-kassemble",
+      "zone": "Songon",
+      "lieu": "Songon Kassemblé",
+      "titre": "1 hectare après les logements sociaux",
+      "type": "surface",
+      "m2": 10000,
+      "prix": 33000,
+      "unite": "m²",
+      "doc": "ACD",
+      "points": [
+        "Surface : 1 hectare",
+        "Après les logements sociaux",
+        "Idéal promoteur ou lotisseur"
+      ]
+    },
+    {
+      "id": "songon-ile-de-paques",
+      "zone": "Songon",
+      "lieu": "Songon · Île de Pâques",
+      "titre": "1 hectare avec vue sur le lac",
+      "type": "surface",
+      "m2": 10000,
+      "prix": 38500,
+      "unite": "m²",
+      "doc": "ACD",
+      "points": [
+        "Surface : 1 hectare",
+        "Vue sur le lac Labion",
+        "Accès par Abrebis"
+      ]
+    },
+    {
+      "id": "cocody-djorogobite2",
+      "zone": "Cocody",
+      "lieu": "Cocody · Djorogobité 2",
+      "titre": "6 hectares en bordure de Y4",
+      "type": "surface",
+      "m2": 60000,
+      "prix": 121000,
+      "unite": "m²",
+      "doc": "ACD",
+      "points": [
+        "Surface : 6 hectares",
+        "Djorogobité 2 extension, bordure Y4",
+        "Pour promoteurs et investisseurs"
+      ]
+    },
+    {
+      "id": "bingerville-eloka",
+      "zone": "Bingerville",
+      "lieu": "Bingerville · Eloka",
+      "titre": "10 hectares entre voie express et Y4",
+      "type": "surface",
+      "m2": 100000,
+      "prix": 38500,
+      "unite": "m²",
+      "doc": "ACD",
+      "points": [
+        "Surface : 10 hectares",
+        "Entre la voie express et la Y4",
+        "Pour promoteurs et investisseurs"
+      ]
+    },
+    {
+      "id": "vitre2-iles-taki",
+      "zone": "Vitré",
+      "lieu": "Vitré 2 · Îles Taki",
+      "titre": "6 hectares à Vitré 2",
+      "type": "surface",
+      "m2": 60000,
+      "prix": 66000,
+      "unite": "m²",
+      "doc": "Approbation",
+      "points": [
+        "Surface : 6 hectares",
+        "Lotissement approuvé",
+        "Pour promoteurs et investisseurs"
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "abbr": "ACD",
+      "nom": "Arrêté de Concession Définitive",
+      "txt": "Acte de l'État qui attribue définitivement le terrain. Le document de référence en Côte d'Ivoire.",
+      "key": "ACD"
+    },
+    {
+      "abbr": "TF",
+      "nom": "Titre foncier",
+      "txt": "Le terrain est immatriculé au livre foncier. Chaque mutation y est inscrite.",
+      "key": "TF"
+    },
+    {
+      "abbr": "Appro.",
+      "nom": "Lotissement approuvé",
+      "txt": "Le plan de lotissement a reçu l'approbation administrative.",
+      "key": "Approbation"
+    },
+    {
+      "abbr": "CF",
+      "nom": "Certificat foncier",
+      "txt": "Constate les droits sur une terre rurale. Étape vers le titre foncier.",
+      "key": "Certificat foncier"
+    },
+    {
+      "abbr": "Att.",
+      "nom": "Attestation",
+      "txt": "Attestation remise pour le lot, vérifiée avant la signature chez le notaire.",
+      "key": "Attestation"
+    }
+  ]
+}
