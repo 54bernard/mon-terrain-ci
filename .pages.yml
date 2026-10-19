@@ -1,0 +1,68 @@
+# Espace d'administration : https://app.pagescms.org (connexion avec le compte GitHub 54bernard)
+media:
+  input: images/uploads
+  output: images/uploads
+  extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: terrains
+    label: Terrains
+    type: file
+    path: data/terrains.json
+    format: json
+    fields:
+      - name: terrains
+        label: Liste des terrains
+        type: object
+        list: true
+        fields:
+          - { name: id, label: "Identifiant (adresse de la page, ex. bingerville-eloka)", type: string, required: true }
+          - name: statut
+            label: Statut
+            type: select
+            required: true
+            options:
+              values:
+                - { value: disponible, label: Disponible }
+                - { value: reserve, label: Réservé }
+                - { value: vendu, label: Vendu }
+          - { name: zone, label: "Localité (ex. Bingerville)", type: string, required: true }
+          - { name: lieu, label: "Lieu précis (ex. Bingerville · Eloka)", type: string, required: true }
+          - { name: titre, label: Titre en français, type: string, required: true }
+          - name: type
+            label: Type
+            type: select
+            required: true
+            options:
+              values:
+                - { value: lot, label: Lot }
+                - { value: surface, label: Grande surface }
+          - { name: m2, label: Surface en m², type: number, required: true }
+          - { name: prix, label: Prix en FCFA, type: number, required: true }
+          - name: unite
+            label: Le prix est
+            type: select
+            options:
+              values:
+                - { value: lot, label: Par lot }
+                - { value: "m²", label: Par m² }
+                - { value: "", label: Prix total }
+          - { name: lots, label: "Nombre de lots disponibles (0 pour un bloc entier)", type: number }
+          - { name: doc, label: "Document (ex. ACD, Approbation, TF + ACD)", type: string, required: true }
+          - { name: points, label: Points forts en français, type: string, list: true }
+          - { name: image, label: Image de la carte (format paysage), type: image, required: true }
+          - { name: fiche, label: Fiche complète (format portrait), type: image, required: true }
+          - { name: photos, label: Galerie photos, type: image, list: true }
+          - name: gps
+            label: Coordonnées GPS (laisser vide si inconnues)
+            type: object
+            fields:
+              - { name: lat, label: "Latitude (ex. 5.3912)", type: number }
+              - { name: lng, label: "Longitude (ex. -3.8521)", type: number }
+          - name: en
+            label: Version anglaise
+            type: object
+            fields:
+              - { name: titre, label: Titre en anglais, type: string }
+              - { name: doc, label: Document en anglais, type: string }
+              - { name: points, label: Points forts en anglais, type: string, list: true }

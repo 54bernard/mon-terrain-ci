@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://54bernard.github.io/mon-terrain-ci/sitemap.xml

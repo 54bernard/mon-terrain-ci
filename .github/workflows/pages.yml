@@ -10,30 +10,22 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verifier:
-    name: Vérifier le site
+    name: Vérifier et générer le site
     runs-on: ubuntu-latest
+    env:
+      SITE_URL: ${{ vars.SITE_URL }}
     steps:
       - uses: actions/checkout@v4
-      - name: Données des terrains valides (JSON)
-        run: |
-          python3 -m json.tool data/terrains.json > /dev/null
-          python3 -m json.tool manifest.webmanifest > /dev/null
-          python3 - <<'PY'
-          import json
-          d = json.load(open("data/terrains.json"))
-          champs = {"id","zone","lieu","titre","type","m2","prix","unite","doc","points"}
-          for t in d["terrains"]:
-              manque = champs - t.keys()
-              assert not manque, f"{t.get('id')} : champs manquants {manque}"
-              assert t["type"] in ("lot","surface"), t["id"]
-              assert isinstance(t["prix"], int) and t["prix"] > 0, t["id"]
-          print(len(d["terrains"]), "terrains valides")
-          PY
-      - name: Aucun script ni style en ligne (politique de sécurité CSP)
-        run: |
-          ! grep -nE '<script>|<style>| style="| on[a-z]+="' index.html 404.html
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Générer les pages (valide les données et la sécurité)
+        run: node scripts/build.mjs
       - name: Plan du site valide (XML)
-        run: python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse('sitemap.xml'); print('sitemap ok')"
+        run: python3 -c "import xml.dom.minidom; xml.dom.minidom.parse('_site/sitemap.xml'); print('sitemap ok')"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
   deployer:
     name: Mettre en ligne
     needs: verifier
@@ -45,10 +37,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
       - id: deployment
         uses: actions/deploy-pages@v4

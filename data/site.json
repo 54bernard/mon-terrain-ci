@@ -1,0 +1,59 @@
+{
+  "nom": "Mon Terrain en Côte d'Ivoire",
+  "url": "https://54bernard.github.io/mon-terrain-ci/",
+  "whatsapp": "2250749479358",
+  "telephone": "+225 07 49 47 93 58",
+  "taux_eur": 655.957,
+  "documents": [
+    {
+      "abbr": "ACD",
+      "nom": "Arrêté de Concession Définitive",
+      "txt": "Acte de l'État qui attribue définitivement le terrain. Le document de référence en Côte d'Ivoire.",
+      "key": "ACD",
+      "en": {
+        "nom": "Final Concession Decree (ACD)",
+        "txt": "The State's deed that definitively grants the land. The reference document in Côte d'Ivoire."
+      }
+    },
+    {
+      "abbr": "TF",
+      "nom": "Titre foncier",
+      "txt": "Le terrain est immatriculé au livre foncier. Chaque mutation y est inscrite.",
+      "key": "TF",
+      "en": {
+        "nom": "Land title (TF)",
+        "txt": "The land is registered in the land register. Every transfer is recorded there."
+      }
+    },
+    {
+      "abbr": "Appro.",
+      "nom": "Lotissement approuvé",
+      "txt": "Le plan de lotissement a reçu l'approbation administrative.",
+      "key": "Approbation",
+      "en": {
+        "nom": "Approved subdivision",
+        "txt": "The subdivision plan has received administrative approval."
+      }
+    },
+    {
+      "abbr": "CF",
+      "nom": "Certificat foncier",
+      "txt": "Constate les droits sur une terre rurale. Étape vers le titre foncier.",
+      "key": "Certificat foncier",
+      "en": {
+        "nom": "Land certificate",
+        "txt": "Records rights over rural land. A step towards the land title."
+      }
+    },
+    {
+      "abbr": "Att.",
+      "nom": "Attestation",
+      "txt": "Attestation remise pour le lot, vérifiée avant la signature chez le notaire.",
+      "key": "Attestation",
+      "en": {
+        "nom": "Attestation",
+        "txt": "Certificate issued for the plot, checked before signing at the notary's office."
+      }
+    }
+  ]
+}

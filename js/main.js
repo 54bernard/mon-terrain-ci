@@ -1,301 +1,283 @@
-// Mon Terrain en Côte d'Ivoire — script principal (module ES)
-// Données reprises des fiches officielles (octobre 2026)
-// Les données des terrains sont dans data/terrains.json : c'est le seul fichier à modifier pour changer un prix ou ajouter un terrain.
-let DATA;
-try {
-  const res = await fetch("data/terrains.json", {cache: "no-cache"});
-  if (!res.ok) throw new Error(res.status);
-  DATA = await res.json();
-} catch (err) {
-  document.getElementById("grid").innerHTML = '<p class="loading">Impossible de charger les terrains. Rechargez la page ou écrivez-nous sur WhatsApp : +225 07 49 47 93 58.</p>';
-  throw err;
-}
-const TERRAINS = DATA.terrains;
-const WA = DATA.contact.whatsapp;
-const DOCS = DATA.documents;
+// Mon Terrain en Côte d'Ivoire — script principal (module ES), commun à toutes les pages.
+import { STR, esc, fmt, eur, tr, totalOf, big, surf, unitOf, asset, homeUrl, waLink, cardHTML, statusRank } from "./shared.js";
+
+const LANG = document.documentElement.lang === "en" ? "en" : "fr";
+const R = document.documentElement.dataset.root || "";
+const PAGE = document.documentElement.dataset.page;
+const S = STR[LANG];
+const U = {
+  fr: { from: "À partir de", see: "Voir les terrains →", copied: "Numéro copié", selected: "Numéro sélectionné", linkCopied: "Lien copié",
+    noFav: ["Aucun favori pour l'instant.", "Touchez le cœur sur un terrain pour le retrouver ici."],
+    noRes: ["Aucun terrain ne correspond à ces critères.", "Élargissez la recherche, ou écrivez-nous : d'autres lots peuvent se libérer."],
+    showAll: "Afficher tous les terrains", available: "disponibles", typeLbl: { lot: "Lots", surface: "Grandes surfaces", fav: "Favoris" },
+    qtyM2: "Surface souhaitée (m²)", qtyLots: "Nombre de lots", lot1: "1 lot", lotsN: n => `${n} lots`,
+    detM2: (q, p, l) => `${q} m² × ${p} FCFA / m² à ${l}`, detLot: (q, p, l, s) => `${q} × ${p} FCFA à ${l} (${s}${q > 1 ? " chacun" : ""})`,
+    offer: (l, t, q, p) => `Bonjour, je souhaite une offre pour ${l} (${t}) : ${q}, soit environ ${p} FCFA. Pouvez-vous me rappeler ?`,
+    hello: n => `Bonjour, je m'appelle ${n}.`, interest: (l, t) => `Je suis intéressé(e) par : ${l}, ${t}.`, looking: "Je cherche un terrain.",
+    visitOn: d => `Date de visite souhaitée : ${d}.`, myNum: n => `Mon numéro : ${n}`,
+    visitMsg: (t, l, d, s) => `Bonjour, je souhaite visiter le terrain « ${t} » à ${l}. Date souhaitée : ${d}, ${s}.`,
+    ready: url => `Votre message est prêt. <a href="${url}" target="_blank" rel="noopener noreferrer"><b>Ouvrir WhatsApp pour l'envoyer</b></a>.`,
+    slots: { matin: "le matin", "apres-midi": "l'après-midi", indifferent: "à n'importe quel moment" }, name: "Nom", tel: "Tél" },
+  en: { from: "From", see: "See the land →", copied: "Number copied", selected: "Number selected", linkCopied: "Link copied",
+    noFav: ["No favourites yet.", "Tap the heart on a property to find it here."],
+    noRes: ["No property matches these criteria.", "Widen your search, or message us: other plots may become available."],
+    showAll: "Show all properties", available: "available", typeLbl: { lot: "Plots", surface: "Large sites", fav: "Favourites" },
+    qtyM2: "Area wanted (m²)", qtyLots: "Number of plots", lot1: "1 plot", lotsN: n => `${n} plots`,
+    detM2: (q, p, l) => `${q} m² × ${p} FCFA / m² in ${l}`, detLot: (q, p, l, s) => `${q} × ${p} FCFA in ${l} (${s}${q > 1 ? " each" : ""})`,
+    offer: (l, t, q, p) => `Hello, I would like an offer for ${l} (${t}): ${q}, about ${p} FCFA. Could you call me back?`,
+    hello: n => `Hello, my name is ${n}.`, interest: (l, t) => `I am interested in: ${l}, ${t}.`, looking: "I am looking for land.",
+    visitOn: d => `Preferred visit date: ${d}.`, myNum: n => `My number: ${n}`,
+    visitMsg: (t, l, d, s) => `Hello, I would like to visit the land "${t}" in ${l}. Preferred date: ${d}, ${s}.`,
+    ready: url => `Your message is ready. <a href="${url}" target="_blank" rel="noopener noreferrer"><b>Open WhatsApp to send it</b></a>.`,
+    slots: { matin: "in the morning", "apres-midi": "in the afternoon", indifferent: "at any time" }, name: "Name", tel: "Phone" }
+}[LANG];
 
 const $ = id => document.getElementById(id);
-const fmt = n => Math.round(n).toLocaleString("fr-FR").replace(/[  ,]/g," ");
-const totalOf = t => t.unite === "m²" ? t.prix * t.m2 : t.prix;
-const big = n => n >= 1e9 ? (n/1e9).toLocaleString("fr-FR",{maximumFractionDigits:2}) + " milliards" : fmt(n);
-const surf = m => m >= 10000 ? fmt(m/10000) + " ha" : fmt(m) + " m²";
-const unitOf = t => t.unite ? "FCFA / " + t.unite : "FCFA";
-const waLink = msg => "https://wa.me/" + WA + "?text=" + encodeURIComponent(msg);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const pin = '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
-const heart = '<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.3C1 8 3.3 4.5 7 4.5c2 0 3.3 1 5 3 1.7-2 3-3 5-3 3.7 0 6 3.5 4.5 7.2C19.5 16.4 12 21 12 21z"/></svg>';
-const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(_){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}};
-const toast = msg => { const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toast.h); toast.h=setTimeout(()=>t.classList.remove("show"),1800); };
-const interestMsg = t => `Bonjour, je suis intéressé(e) par le terrain « ${t.titre} » à ${t.lieu} (${fmt(t.prix)} ${unitOf(t)}). Est-il toujours disponible ?`;
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (_) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (_) {} } };
+const toast = msg => { const t = $("toast"); if (!t) return; t.textContent = msg; t.classList.add("show"); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 1800); };
+const fmtDate = v => new Date(v + "T12:00:00").toLocaleDateString(S.locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const todayISO = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const openWa = url => window.open(url, "_blank", "noopener,noreferrer");
 
-let favs = new Set(store.get("mt-favs", []));
-const state = {zone:"", type:"", doc:"", budget:"", sort:""};
-
-/* ---------- catalogue ---------- */
-function card(t){
-  const tot = t.unite === "m²" ? `<span class="total">Soit ${big(totalOf(t))} FCFA pour ${surf(t.m2)}</span>` : "";
-  const avail = t.lots ? (t.lots === 1 ? "1 lot" : t.lots + " lots") : "Bloc entier";
-  return `<article class="card">
-    <div class="media">
-      <img src="images/${t.id}.webp" alt="" loading="lazy" width="960" height="323">
-      <button class="open" type="button" data-open="${t.id}" aria-label="Voir la fiche : ${esc(t.lieu)}"></button>
-      <div class="badges"><span class="badge o">${t.type === "lot" ? "Lot" : "Grande surface"}</span>${t.lots === 1 ? '<span class="badge hot">Dernier lot</span>' : ""}</div>
-      <button class="fav" type="button" data-fav="${t.id}" aria-pressed="${favs.has(t.id)}" aria-label="Ajouter ${esc(t.lieu)} aux favoris">${heart}</button>
-      <div class="where"><small>${pin}${esc(t.zone)}</small><b>${esc(t.lieu)}</b></div>
-    </div>
-    <div class="body">
-      <h3>${esc(t.titre)}</h3>
-      <div class="price"><span class="amt">${fmt(t.prix)}</span><span class="unit">${unitOf(t)}</span>${tot}</div>
-      <div class="specs"><div><span>Surface</span><b>${surf(t.m2)}</b></div><div><span>Document</span><b>${esc(t.doc)}</b></div><div><span>Dispo</span><b>${avail}</b></div></div>
-      <ul class="checks">${t.points.slice(1).map(p => `<li>${esc(p)}</li>`).join("")}</ul>
-      <div class="foot">
-        <a class="btn btn-primary" href="${waLink(interestMsg(t))}" target="_blank" rel="noopener noreferrer">Ce terrain m'intéresse</a>
-        <button class="btn btn-soft" type="button" data-open="${t.id}">Détails</button>
-      </div>
-    </div>
-  </article>`;
-}
-function filtered(){
-  let list = TERRAINS.filter(t =>
-    (!state.zone || t.zone === state.zone) &&
-    (!state.type || (state.type === "fav" ? favs.has(t.id) : t.type === state.type)) &&
-    (!state.doc || t.doc.includes(state.doc)) &&
-    (!state.budget || (() => { const [a,b] = state.budget.split("-").map(Number); const v = totalOf(t); return v >= a && v < b; })()));
-  if (state.sort === "asc") list = [...list].sort((a,b) => totalOf(a) - totalOf(b));
-  if (state.sort === "desc") list = [...list].sort((a,b) => totalOf(b) - totalOf(a));
-  if (state.sort === "surf") list = [...list].sort((a,b) => b.m2 - a.m2);
-  return list;
-}
-let current = [];
-function paint(){
-  current = filtered();
-  $("grid").innerHTML = current.length ? current.map(card).join("") :
-    `<div class="empty"><strong>${state.type === "fav" ? "Aucun favori pour l'instant." : "Aucun terrain ne correspond à ces critères."}</strong><span>${state.type === "fav" ? "Touchez le cœur sur un terrain pour le retrouver ici." : "Élargissez la recherche, ou écrivez-nous : d'autres lots peuvent se libérer."}</span><button class="btn btn-soft" type="button" id="resetAll">Afficher tous les terrains</button></div>`;
-  const tags = [state.zone, state.type === "lot" ? "Lots" : state.type === "surface" ? "Grandes surfaces" : state.type === "fav" ? "Favoris" : "", state.doc, state.budget ? $("fBudget").selectedOptions[0].text : ""].filter(Boolean);
-  $("resultLine").textContent = `${current.length} terrain${current.length > 1 ? "s" : ""}` + (tags.length ? " · " + tags.join(" · ") : " disponibles");
-  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.type === state.type)));
-  $("fZone").value = state.zone; $("fDoc").value = state.doc; $("fBudget").value = state.budget; $("fSort").value = state.sort;
-  $("fType").value = state.type === "fav" ? "" : state.type;
-  const r = $("resetAll"); if (r) r.onclick = () => { Object.assign(state,{zone:"",type:"",doc:"",budget:"",sort:""}); render(); };
-}
-const render = () => document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches ? document.startViewTransition(paint) : paint();
-
-function updateFavCount(){ const n = favs.size; $("favCount").hidden = !n; $("favCount").textContent = n; }
-function toggleFav(id){
-  favs.has(id) ? favs.delete(id) : favs.add(id);
-  store.set("mt-favs", [...favs]); updateFavCount();
-  document.querySelectorAll(`[data-fav="${id}"]`).forEach(b => b.setAttribute("aria-pressed", String(favs.has(id))));
-  toast(favs.has(id) ? "Ajouté aux favoris" : "Retiré des favoris");
-  if (state.type === "fav") render();
-}
-$("grid").addEventListener("click", e => {
-  const f = e.target.closest("[data-fav]"); if (f) return toggleFav(f.dataset.fav);
-  const o = e.target.closest("[data-open]"); if (o) openFiche(o.dataset.open);
-});
-
-/* ---------- selects & filters ---------- */
-const zones = [...new Set(TERRAINS.map(t => t.zone))];
-$("fZone").insertAdjacentHTML("beforeend", zones.map(z => `<option value="${esc(z)}">${esc(z)}</option>`).join(""));
-$("cTerrain").insertAdjacentHTML("beforeend", TERRAINS.map(t => `<option value="${t.id}">${esc(t.lieu)} · ${esc(t.titre)}</option>`).join(""));
-$("footZones").innerHTML = zones.map(z => `<li><a href="#terrains" data-zone="${esc(z)}">${esc(z)}</a></li>`).join("");
-/* ---------- localités : bandeau + carrousel ---------- */
-const ZONE_IMG = {"Yamoussoukro":"yamoussoukro","Jacqueville":"jacqueville","Vitré":"vitre1","Anyama":"anyama-adjame","Assini":"assini-koko-manzan","Bingerville":"bingerville-barque","Autoroute du Nord":"km22-autoroute","Songon":"songon-ile-de-paques","Cocody":"cocody-djorogobite2"};
-const zoneInfo = zones.map(z => {
-  const list = TERRAINS.filter(t => t.zone === z), lots = list.filter(t => t.type === "lot"), surfs = list.filter(t => t.type === "surface");
-  const from = lots.length ? (() => { const m = lots.reduce((a,b) => a.prix <= b.prix ? a : b); return `${fmt(m.prix)} ${unitOf(m)}`; })()
-                           : (() => { const m = surfs.reduce((a,b) => a.prix <= b.prix ? a : b); return `${fmt(m.prix)} FCFA / m²`; })();
-  const places = [...new Set(list.map(t => t.lieu.includes("·") ? t.lieu.split("·")[1].trim() : t.lieu))];
-  return {z, n:list.length, from, places, img: ZONE_IMG[z] || list[0].id};
-});
-const mItem = (i, hide) => `<span class="item"${hide ? ' aria-hidden="true"' : ""}><button type="button" data-zone="${esc(i.z)}"${hide ? ' tabindex="-1"' : ""}>${esc(i.z)}<small>${i.n} terrain${i.n > 1 ? "s" : ""}</small></button></span>`;
-$("marquee").innerHTML = zoneInfo.map(i => mItem(i)).join("") + zoneInfo.map(i => mItem(i, true)).join("");
-$("zc").innerHTML = zoneInfo.map(i => `<button class="zcard" type="button" data-zone="${esc(i.z)}">
-  <span class="zimg"><img src="images/${i.img}.webp" alt="" loading="lazy"><span class="zcount">${i.n} terrain${i.n > 1 ? "s" : ""}</span><span class="zname">${esc(i.z)}</span></span>
-  <span class="zbody"><span class="zplaces">${i.places.map(p => `<span>${esc(p)}</span>`).join("")}</span>
-  <span class="zfrom">À partir de<b>${i.from}</b></span><span class="zgo">Voir les terrains →</span></span></button>`).join("");
-const goZone = z => { Object.assign(state, {zone:z, type:"", doc:"", budget:""}); render(); $("terrains").scrollIntoView(); };
-[$("marquee"), $("zc")].forEach(el => el.addEventListener("click", e => { const b = e.target.closest("[data-zone]"); if (b) goZone(b.dataset.zone); }));
-// défilement automatique du carrousel
-const zc = $("zc");
-const zStep = () => (zc.querySelector(".zcard")?.offsetWidth || 300) + 16;
-const zMove = d => {
-  const max = zc.scrollWidth - zc.clientWidth;
-  if (d > 0 && zc.scrollLeft >= max - 4) zc.scrollTo({left:0, behavior:"smooth"});
-  else if (d < 0 && zc.scrollLeft <= 4) zc.scrollTo({left:max, behavior:"smooth"});
-  else zc.scrollBy({left:d * zStep(), behavior:"smooth"});
-};
-$("zcPrev").onclick = () => zMove(-1); $("zcNext").onclick = () => zMove(1);
-let zPaused = false;
-["mouseenter","touchstart","focusin"].forEach(ev => zc.addEventListener(ev, () => zPaused = true, {passive:true}));
-["mouseleave","focusout"].forEach(ev => zc.addEventListener(ev, () => zPaused = false));
-zc.addEventListener("touchend", () => setTimeout(() => zPaused = false, 4000), {passive:true});
-if (!matchMedia("(prefers-reduced-motion: reduce)").matches) setInterval(() => { if (!zPaused && !document.hidden) zMove(1); }, 3000);
-$("finder").addEventListener("submit", e => {
-  e.preventDefault();
-  Object.assign(state, {zone:$("fZone").value, type:$("fType").value, budget:$("fBudget").value});
-  render(); $("terrains").scrollIntoView();
-});
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.type = b.dataset.type; render(); }));
-$("fDoc").addEventListener("change", e => { state.doc = e.target.value; render(); });
-$("fSort").addEventListener("change", e => { state.sort = e.target.value; render(); });
-$("footZones").addEventListener("click", e => { const a = e.target.closest("[data-zone]"); if (a) { Object.assign(state,{zone:a.dataset.zone,type:"",doc:"",budget:""}); render(); } });
-const showFavs = () => { state.type = "fav"; render(); $("terrains").scrollIntoView(); };
-$("favBtn").addEventListener("click", showFavs);
-$("dockFav").addEventListener("click", showFavs);
-
-/* ---------- documents ---------- */
-$("docGrid").innerHTML = DOCS.map(d => {
-  const n = TERRAINS.filter(t => t.doc.includes(d.key)).length;
-  return `<button class="doc reveal" type="button" data-doc="${esc(d.key)}"><span class="abbr">${d.abbr}</span><h3>${d.nom}</h3><p>${d.txt}</p><span class="n"><span>${n} terrain${n > 1 ? "s" : ""}</span><span>Voir →</span></span></button>`;
-}).join("");
-$("docGrid").addEventListener("click", e => { const b = e.target.closest("[data-doc]"); if (!b) return; Object.assign(state,{doc:b.dataset.doc,type:"",zone:"",budget:""}); render(); $("terrains").scrollIntoView(); });
-
-/* ---------- fiche (dialog) ---------- */
-const dlg = $("fiche"); let dIndex = 0;
-function fillFiche(t){
-  $("dImg").src = "images/fiche-" + t.id + ".webp";
-  $("dImg").alt = `Fiche officielle : ${t.lieu}, ${t.titre}, ${fmt(t.prix)} ${unitOf(t)}, document ${t.doc}`;
-  $("dZone").textContent = t.lieu;
-  $("dTitle").textContent = t.titre;
-  $("dPrice").innerHTML = `<span class="amt">${fmt(t.prix)}</span><span class="unit">${unitOf(t)}</span>` + (t.unite === "m²" ? `<span class="total">Soit ${big(totalOf(t))} FCFA pour ${surf(t.m2)}</span>` : "");
-  $("dSpecs").innerHTML = `<div><span>Surface</span><b>${surf(t.m2)}</b></div><div><span>Document</span><b>${esc(t.doc)}</b></div><div><span>Dispo</span><b>${t.lots ? t.lots + (t.lots > 1 ? " lots" : " lot") : "Bloc entier"}</b></div>`;
-  $("dChecks").innerHTML = t.points.map(p => `<li>${esc(p)}</li>`).join("") + "<li>Vente sécurisée chez le notaire</li>";
-  $("dWa").href = waLink(interestMsg(t));
-}
-function openFiche(id){
-  const list = current.length ? current : TERRAINS;
-  dIndex = Math.max(0, list.findIndex(t => t.id === id));
-  fillFiche(list[dIndex] || TERRAINS.find(t => t.id === id));
-  if (!dlg.open) dlg.showModal ? dlg.showModal() : dlg.setAttribute("open","");
-}
-const step = d => { const list = current.length ? current : TERRAINS; dIndex = (dIndex + d + list.length) % list.length; fillFiche(list[dIndex]); };
-$("dPrev").onclick = () => step(-1); $("dNext").onclick = () => step(1);
-$("dClose").onclick = () => dlg.close();
-dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
-dlg.addEventListener("keydown", e => { if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1); });
-let tx = null;
-dlg.addEventListener("touchstart", e => tx = e.touches[0].clientX, {passive:true});
-dlg.addEventListener("touchend", e => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1); tx = null; });
-
-/* ---------- hero deck ---------- */
-const DECK = ["cocody-djorogobite2","jacqueville","yamoussoukro","songon-ile-de-paques","vitre1"];
-const deck = $("deck");
-deck.insertAdjacentHTML("beforeend", DECK.map(id => { const t = TERRAINS.find(x => x.id === id); return `<button type="button" data-open="${id}" aria-label="Voir la fiche : ${esc(t.lieu)}"><img src="images/fiche-${id}.webp" alt=""></button>`; }).join(""));
-const cards = [...deck.querySelectorAll("button")];
-let deckTop = 0;
-function layoutDeck(){
-  cards.forEach((c,i) => {
-    const k = (i - deckTop + cards.length) % cards.length;
-    const pos = [[0,0,0,1],[64,-14,8,.92],[-64,-14,-8,.92],[110,-28,14,.84],[-110,-28,-14,.84]][k];
-    c.style.transform = `translate(-50%,-50%) translateX(${pos[0]}px) translateY(${pos[1]}px) rotate(${pos[2]}deg) scale(${pos[3]})`;
-    c.style.zIndex = 10 - k;
-    c.style.filter = k ? `brightness(${1 - k*.1})` : "none";
-    c.tabIndex = k ? -1 : 0;
-  });
-}
-layoutDeck();
-deck.addEventListener("click", e => { const b = e.target.closest("[data-open]"); if (b) openFiche(b.dataset.open); });
-let deckTimer = matchMedia("(prefers-reduced-motion: reduce)").matches ? null : setInterval(() => { deckTop = (deckTop + 1) % cards.length; layoutDeck(); }, 3600);
-deck.addEventListener("mouseenter", () => clearInterval(deckTimer));
-
-/* ---------- hero canvas: parcel grid ---------- */
-(() => {
-  const cv = $("plots"), ctx = cv.getContext("2d");
-  let w, h, cells = [], t0 = performance.now();
-  const S = 64;
-  function size(){
-    const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
-    w = r.width; h = r.height; cv.width = w*dpr; cv.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
-    cells = [];
-    for (let y = 0; y < h/S + 1; y++) for (let x = 0; x < w/S + 1; x++) cells.push({x, y, p: Math.random()*Math.PI*2, hot: Math.random() < .035});
-  }
-  function draw(now){
-    const t = (now - t0) / 1000;
-    ctx.clearRect(0,0,w,h);
-    for (const c of cells){
-      const a = .05 + .04*Math.sin(t*.6 + c.p);
-      ctx.fillStyle = `rgba(110,190,130,${a})`;
-      ctx.beginPath(); ctx.roundRect(c.x*S + 4, c.y*S + 4, S - 8, S - 8, 6); ctx.fill();
-      if (c.hot){
-        ctx.strokeStyle = `rgba(238,138,38,${.35 + .3*Math.sin(t*1.2 + c.p)})`;
-        ctx.setLineDash([6,5]); ctx.lineWidth = 1.5;
-        ctx.strokeRect(c.x*S + 4, c.y*S + 4, S - 8, S - 8); ctx.setLineDash([]);
-      }
-    }
-    // route
-    ctx.strokeStyle = "rgba(238,138,38,.18)"; ctx.lineWidth = 18;
-    ctx.beginPath(); ctx.moveTo(0, h*.82); ctx.lineTo(w, h*.38); ctx.stroke();
-    ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5; ctx.setLineDash([14,12]); ctx.lineDashOffset = -t*20;
-    ctx.beginPath(); ctx.moveTo(0, h*.82); ctx.lineTo(w, h*.38); ctx.stroke(); ctx.setLineDash([]);
-    if (!reduce) requestAnimationFrame(draw);
-  }
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  size(); addEventListener("resize", size); requestAnimationFrame(draw);
-})();
-
-/* ---------- simulateur ---------- */
-$("sTerrain").innerHTML = TERRAINS.map(t => `<option value="${t.id}">${esc(t.lieu)} · ${fmt(t.prix)} ${unitOf(t)}</option>`).join("");
-$("sTerrain").value = "km22-autoroute";
-function setupQty(){
-  const t = TERRAINS.find(x => x.id === $("sTerrain").value), q = $("sQty");
-  if (t.unite === "m²"){ $("sQtyLbl").textContent = "Surface souhaitée (m²)"; q.min = 500; q.max = t.m2; q.step = 100; q.value = Math.min(1000, t.m2); }
-  else { $("sQtyLbl").textContent = "Nombre de lots"; q.min = 1; q.max = t.lots || 1; q.step = 1; q.value = 1; }
-  $("sQtyWrap").hidden = t.unite !== "m²" && (t.lots || 1) === 1;
-  calc();
-}
-function calc(){
-  const t = TERRAINS.find(x => x.id === $("sTerrain").value), q = +$("sQty").value, fees = +$("sFees").value;
-  const price = t.unite === "m²" ? t.prix * q : t.prix * q;
-  const fa = price * fees / 100;
-  $("sQtyOut").textContent = t.unite === "m²" ? fmt(q) + " m²" : q + (q > 1 ? " lots" : " lot");
-  $("sFeesOut").textContent = fees.toLocaleString("fr-FR") + " %";
-  $("sAmount").textContent = big(price) + " FCFA";
-  $("sDetail").textContent = t.unite === "m²" ? `${fmt(q)} m² × ${fmt(t.prix)} FCFA / m² à ${t.lieu}` : `${q} × ${fmt(t.prix)} FCFA à ${t.lieu} (${surf(t.m2)}${q > 1 ? " chacun" : ""})`;
-  $("sPrice").textContent = fmt(price) + " FCFA";
-  $("sFeesAmt").textContent = fmt(fa) + " FCFA";
-  $("sTotal").textContent = fmt(price + fa) + " FCFA";
-  $("sWa").href = waLink(`Bonjour, je souhaite une offre pour ${t.lieu} (${t.titre}) : ${$("sQtyOut").textContent}, soit environ ${fmt(price)} FCFA. Pouvez-vous me rappeler ?`);
-}
-$("sTerrain").addEventListener("change", setupQty);
-$("sQty").addEventListener("input", calc);
-$("sFees").addEventListener("input", calc);
-setupQty();
-
-/* ---------- header, menu, thème ---------- */
+/* ---------- commun : en-tête, menu, thème, favoris ---------- */
 const hdr = $("siteHeader");
-const onScroll = () => hdr.classList.toggle("scrolled", scrollY > 40);
-addEventListener("scroll", onScroll, {passive:true}); onScroll();
+if (hdr) { const onScroll = () => hdr.classList.toggle("scrolled", scrollY > 40); addEventListener("scroll", onScroll, { passive: true }); onScroll(); }
 const menuBtn = $("menuBtn"), nav = $("mainNav");
-menuBtn.addEventListener("click", () => { const o = nav.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", String(o)); });
-nav.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded","false"); } });
+menuBtn?.addEventListener("click", () => { const o = nav.classList.toggle("open"); menuBtn.setAttribute("aria-expanded", String(o)); });
+nav?.addEventListener("click", e => { if (e.target.closest("a")) { nav.classList.remove("open"); menuBtn.setAttribute("aria-expanded", "false"); } });
 const savedTheme = store.get("mt-theme", null);
 if (savedTheme) document.documentElement.dataset.theme = savedTheme;
-$("themeBtn").addEventListener("click", () => {
+$("themeBtn")?.addEventListener("click", () => {
   const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   const next = cur === "dark" ? "light" : "dark";
   document.documentElement.dataset.theme = next; store.set("mt-theme", next);
 });
 
-/* ---------- contact ---------- */
-$("copyBtn").addEventListener("click", () => {
-  const num = "+225 07 49 47 93 58";
-  const fallback = () => { const r = document.createRange(); r.selectNodeContents($("phone")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Numéro sélectionné"); };
-  try { navigator.clipboard.writeText(num).then(() => toast("Numéro copié"), fallback); } catch (_) { fallback(); }
+let favs = new Set(store.get("mt-favs", []));
+const syncFavs = () => {
+  const c = $("favCount"); if (c) { c.hidden = !favs.size; c.textContent = favs.size; }
+  document.querySelectorAll("[data-fav]").forEach(b => b.setAttribute("aria-pressed", String(favs.has(b.dataset.fav))));
+};
+document.addEventListener("click", e => {
+  const f = e.target.closest("[data-fav]"); if (!f) return;
+  const id = f.dataset.fav;
+  favs.has(id) ? favs.delete(id) : favs.add(id);
+  store.set("mt-favs", [...favs]); syncFavs(); toast(favs.has(id) ? S.favOn : S.favOff);
+  if (state.type === "fav") render();
 });
-$("contactForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const t = TERRAINS.find(x => x.id === $("cTerrain").value);
-  const msg = [`Bonjour, je m'appelle ${$("cName").value.trim()}.`, t ? `Je suis intéressé(e) par : ${t.lieu}, ${t.titre}.` : "Je cherche un terrain.", $("cMsg").value.trim(), $("cTel").value.trim() ? `Mon numéro : ${$("cTel").value.trim()}` : ""].filter(Boolean).join("\n");
-  const url = waLink(msg);
-  $("formNote").innerHTML = `Votre message est prêt. <a href="${url}" target="_blank" rel="noopener noreferrer"><b>Ouvrir WhatsApp pour l'envoyer</b></a>. Sinon, écrivez au +225 07 49 47 93 58.`;
-  window.open(url, "_blank", "noopener,noreferrer");
-});
+const goFavs = () => { if (PAGE === "home") { state.type = "fav"; render(); $("terrains").scrollIntoView(); } else location.href = homeUrl(LANG, R) + "#favoris"; };
+$("favBtn")?.addEventListener("click", goFavs);
+$("dockFav")?.addEventListener("click", goFavs);
 
-updateFavCount();
-paint();
+/* ---------- commun : carte ---------- */
+const mapEl = $("map");
 
-/* ---------- mode hors ligne et chargement instantané (service worker) ---------- */
-if ("serviceWorker" in navigator && location.protocol === "https:") {
-  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+/* ---------- accueil ---------- */
+const state = { zone: "", type: "", doc: "", budget: "", sort: "" };
+let TERRAINS = [], SITE = {}, current = [];
+let render = () => {};
+
+if (PAGE === "home") {
+  try {
+    const data = await (await fetch(R + "data/terrains.json", { cache: "no-cache" })).json();
+    TERRAINS = data.terrains; SITE = data.site;
+  } catch (_) { /* le catalogue généré reste affiché, sans filtres dynamiques */ }
+
+  if (TERRAINS.length) {
+    const grid = $("grid");
+    const filtered = () => {
+      let list = TERRAINS.filter(t =>
+        (!state.zone || t.zone === state.zone) &&
+        (!state.type || (state.type === "fav" ? favs.has(t.id) : t.type === state.type)) &&
+        (!state.doc || t.doc.includes(state.doc)) &&
+        (!state.budget || (() => { const [a, b] = state.budget.split("-").map(Number); const v = totalOf(t); return v >= a && v < b; })()));
+      const by = { asc: (a, b) => totalOf(a) - totalOf(b), desc: (a, b) => totalOf(b) - totalOf(a), surf: (a, b) => b.m2 - a.m2 }[state.sort];
+      return [...list].sort((a, b) => statusRank(a) - statusRank(b) || (by ? by(a, b) : 0));
+    };
+    const paint = () => {
+      current = filtered();
+      const empty = state.type === "fav" ? U.noFav : U.noRes;
+      grid.innerHTML = current.length ? current.map(t => cardHTML(t, LANG, R, SITE, favs.has(t.id))).join("") :
+        `<div class="empty"><strong>${empty[0]}</strong><span>${empty[1]}</span><button class="btn btn-soft" type="button" id="resetAll">${U.showAll}</button></div>`;
+      const tags = [state.zone, U.typeLbl[state.type], state.doc, state.budget ? $("fBudget").selectedOptions[0].text : ""].filter(Boolean);
+      $("resultLine").textContent = S.n(current.length) + (tags.length ? " · " + tags.join(" · ") : " " + U.available);
+      document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.type === state.type)));
+      $("fZone").value = state.zone; $("fDoc").value = state.doc; $("fBudget").value = state.budget; $("fSort").value = state.sort;
+      $("fType").value = state.type === "fav" ? "" : state.type;
+      $("resetAll")?.addEventListener("click", () => { Object.assign(state, { zone: "", type: "", doc: "", budget: "", sort: "" }); render(); });
+    };
+    render = () => document.startViewTransition && !reduce ? document.startViewTransition(paint) : paint();
+
+    $("finder").addEventListener("submit", e => {
+      e.preventDefault();
+      Object.assign(state, { zone: $("fZone").value, type: $("fType").value, budget: $("fBudget").value });
+      render(); $("terrains").scrollIntoView();
+    });
+    document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.type = b.dataset.type; render(); }));
+    $("fDoc").addEventListener("change", e => { state.doc = e.target.value; render(); });
+    $("fSort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+    const goZone = z => { Object.assign(state, { zone: z, type: "", doc: "", budget: "" }); render(); $("terrains").scrollIntoView(); };
+    $("docGrid").addEventListener("click", e => { const b = e.target.closest("[data-doc]"); if (!b) return; Object.assign(state, { doc: b.dataset.doc, type: "", zone: "", budget: "" }); render(); $("terrains").scrollIntoView(); });
+
+    /* localités : bandeau + carrousel */
+    const zones = [...new Set(TERRAINS.map(t => t.zone))];
+    const ZONE_IMG = { "Vitré": "vitre1", "Songon": "songon-ile-de-paques", "Bingerville": "bingerville-barque", "Autoroute du Nord": "km22-autoroute" };
+    const info = zones.map(z => {
+      const list = TERRAINS.filter(t => t.zone === z && t.statut !== "vendu"), all = TERRAINS.filter(t => t.zone === z);
+      const pool = (list.length ? list : all), lots = pool.filter(t => t.type === "lot"), base = lots.length ? lots : pool;
+      const m = base.reduce((a, b) => a.prix <= b.prix ? a : b);
+      const imgT = all.find(t => t.id === ZONE_IMG[z]) || all[0];
+      return { z, n: list.length, from: `${fmt(m.prix, LANG)} ${unitOf(m, LANG)}`, img: imgT.image,
+        places: [...new Set(all.map(t => t.lieu.includes("·") ? t.lieu.split("·")[1].trim() : t.lieu))] };
+    });
+    const item = (i, hide) => `<span class="item"${hide ? ' aria-hidden="true"' : ""}><button type="button" data-zone="${esc(i.z)}"${hide ? ' tabindex="-1"' : ""}>${esc(i.z)}<small>${S.n(i.n)}</small></button></span>`;
+    $("marquee").innerHTML = info.map(i => item(i)).join("") + info.map(i => item(i, true)).join("");
+    $("zc").innerHTML = info.map(i => `<button class="zcard" type="button" data-zone="${esc(i.z)}">
+      <span class="zimg"><img src="${asset(R, i.img)}" alt="" loading="lazy" decoding="async"><span class="zcount">${S.n(i.n)}</span><span class="zname">${esc(i.z)}</span></span>
+      <span class="zbody"><span class="zplaces">${i.places.map(p => `<span>${esc(p)}</span>`).join("")}</span>
+      <span class="zfrom">${U.from}<b>${i.from}</b></span><span class="zgo">${U.see}</span></span></button>`).join("");
+    [$("marquee"), $("zc"), $("footZones")].forEach(el => el?.addEventListener("click", e => { const b = e.target.closest("[data-zone]"); if (b) { e.preventDefault(); goZone(b.dataset.zone); } }));
+    const zc = $("zc"), zStep = () => (zc.querySelector(".zcard")?.offsetWidth || 300) + 16;
+    const zMove = d => {
+      const max = zc.scrollWidth - zc.clientWidth;
+      if (d > 0 && zc.scrollLeft >= max - 4) zc.scrollTo({ left: 0, behavior: "smooth" });
+      else if (d < 0 && zc.scrollLeft <= 4) zc.scrollTo({ left: max, behavior: "smooth" });
+      else zc.scrollBy({ left: d * zStep(), behavior: "smooth" });
+    };
+    $("zcPrev").onclick = () => zMove(-1); $("zcNext").onclick = () => zMove(1);
+    let zPaused = false;
+    ["mouseenter", "touchstart", "focusin"].forEach(ev => zc.addEventListener(ev, () => zPaused = true, { passive: true }));
+    ["mouseleave", "focusout"].forEach(ev => zc.addEventListener(ev, () => zPaused = false));
+    zc.addEventListener("touchend", () => setTimeout(() => zPaused = false, 4000), { passive: true });
+    if (!reduce) setInterval(() => { if (!zPaused && !document.hidden) zMove(1); }, 3000);
+
+    /* simulateur */
+    const sSel = $("sTerrain");
+    sSel.innerHTML = TERRAINS.filter(t => t.statut !== "vendu").map(t => `<option value="${esc(t.id)}">${esc(t.lieu)} · ${fmt(t.prix, LANG)} ${unitOf(t, LANG)}</option>`).join("");
+    if (TERRAINS.some(t => t.id === "km22-autoroute" && t.statut !== "vendu")) sSel.value = "km22-autoroute";
+    const sT = () => TERRAINS.find(x => x.id === sSel.value);
+    const calc = () => {
+      const t = sT(); if (!t) return;
+      const q = +$("sQty").value, fees = +$("sFees").value, price = t.prix * q, fa = price * fees / 100;
+      $("sQtyOut").textContent = t.unite === "m²" ? fmt(q, LANG) + " m²" : (q > 1 ? U.lotsN(q) : U.lot1);
+      $("sFeesOut").textContent = fees.toLocaleString(S.locale) + " %";
+      $("sAmount").textContent = big(price, LANG) + " FCFA";
+      $("sEur").textContent = "≈ " + eur(price, LANG);
+      $("sDetail").textContent = t.unite === "m²" ? U.detM2(fmt(q, LANG), fmt(t.prix, LANG), t.lieu) : U.detLot(q, fmt(t.prix, LANG), t.lieu, surf(t.m2, LANG));
+      $("sPrice").textContent = fmt(price, LANG) + " FCFA";
+      $("sFeesAmt").textContent = fmt(fa, LANG) + " FCFA";
+      $("sTotal").textContent = `${fmt(price + fa, LANG)} FCFA · ≈ ${eur(price + fa, LANG)}`;
+      $("sWa").href = waLink(SITE.whatsapp, U.offer(t.lieu, tr(t, LANG, "titre"), $("sQtyOut").textContent, fmt(price, LANG)));
+    };
+    const setupQty = () => {
+      const t = sT(), q = $("sQty"); if (!t) return;
+      if (t.unite === "m²") { $("sQtyLbl").textContent = U.qtyM2; q.min = Math.min(500, t.m2); q.max = t.m2; q.step = 100; q.value = Math.min(1000, t.m2); }
+      else { $("sQtyLbl").textContent = U.qtyLots; q.min = 1; q.max = t.lots || 1; q.step = 1; q.value = 1; }
+      $("sQtyWrap").hidden = t.unite !== "m²" && (t.lots || 1) === 1;
+      calc();
+    };
+    sSel.addEventListener("change", setupQty); $("sQty").addEventListener("input", calc); $("sFees").addEventListener("input", calc);
+    setupQty();
+
+    /* formulaire de contact */
+    const cDate = $("cDate"); cDate.min = todayISO();
+    $("contactForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const t = TERRAINS.find(x => x.id === $("cTerrain").value);
+      const msg = [U.hello($("cName").value.trim()), t ? U.interest(t.lieu, tr(t, LANG, "titre")) : U.looking,
+        cDate.value ? U.visitOn(fmtDate(cDate.value)) : "", $("cMsg").value.trim(), $("cTel").value.trim() ? U.myNum($("cTel").value.trim()) : ""].filter(Boolean).join("\n");
+      const url = waLink(SITE.whatsapp, msg);
+      $("formNote").innerHTML = U.ready(url);
+      openWa(url);
+    });
+
+    if (location.hash === "#favoris") { state.type = "fav"; paint(); }
+    else paint();
+  }
+
+  /* fiches en éventail */
+  const deck = $("deck");
+  if (deck) {
+    const cards = [...deck.querySelectorAll("a")];
+    let top = 0;
+    const layoutDeck = () => cards.forEach((c, i) => {
+      const k = (i - top + cards.length) % cards.length;
+      const p = [[0, 0, 0, 1], [64, -14, 8, .92], [-64, -14, -8, .92], [110, -28, 14, .84], [-110, -28, -14, .84]][k] || [0, 0, 0, .8];
+      c.style.transform = `translate(-50%,-50%) translateX(${p[0]}px) translateY(${p[1]}px) rotate(${p[2]}deg) scale(${p[3]})`;
+      c.style.zIndex = 10 - k; c.style.filter = k ? `brightness(${1 - k * .1})` : "none"; c.tabIndex = k ? -1 : 0;
+    });
+    layoutDeck();
+    let timer = reduce ? null : setInterval(() => { top = (top + 1) % cards.length; layoutDeck(); }, 3600);
+    deck.addEventListener("mouseenter", () => clearInterval(timer));
+  }
+
+  /* fond animé : parcelles */
+  const cv = $("plots");
+  if (cv) {
+    const ctx = cv.getContext("2d"); let w, h, cells = []; const SZ = 64, t0 = performance.now();
+    const size = () => {
+      const r = cv.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+      w = r.width; h = r.height; cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cells = []; for (let y = 0; y < h / SZ + 1; y++) for (let x = 0; x < w / SZ + 1; x++) cells.push({ x, y, p: Math.random() * 6.28, hot: Math.random() < .035 });
+    };
+    let visible = true;
+    new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !reduce) requestAnimationFrame(draw); }).observe(cv);
+    function draw(now) {
+      const t = (now - t0) / 1000; ctx.clearRect(0, 0, w, h);
+      for (const c of cells) {
+        ctx.fillStyle = `rgba(110,190,130,${.05 + .04 * Math.sin(t * .6 + c.p)})`;
+        ctx.beginPath(); ctx.roundRect(c.x * SZ + 4, c.y * SZ + 4, SZ - 8, SZ - 8, 6); ctx.fill();
+        if (c.hot) { ctx.strokeStyle = `rgba(238,138,38,${.35 + .3 * Math.sin(t * 1.2 + c.p)})`; ctx.setLineDash([6, 5]); ctx.lineWidth = 1.5; ctx.strokeRect(c.x * SZ + 4, c.y * SZ + 4, SZ - 8, SZ - 8); ctx.setLineDash([]); }
+      }
+      ctx.strokeStyle = "rgba(238,138,38,.18)"; ctx.lineWidth = 18; ctx.beginPath(); ctx.moveTo(0, h * .82); ctx.lineTo(w, h * .38); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5; ctx.setLineDash([14, 12]); ctx.lineDashOffset = -t * 20;
+      ctx.beginPath(); ctx.moveTo(0, h * .82); ctx.lineTo(w, h * .38); ctx.stroke(); ctx.setLineDash([]);
+      if (!reduce && visible) requestAnimationFrame(draw);
+    }
+    size(); addEventListener("resize", size); requestAnimationFrame(draw);
+  }
+
+  /* copier le numéro */
+  $("copyBtn")?.addEventListener("click", () => {
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents($("phone")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast(U.selected); };
+    try { navigator.clipboard.writeText($("phone").textContent.trim()).then(() => toast(U.copied), fallback); } catch (_) { fallback(); }
+  });
+
+  if (mapEl) {
+    const pts = TERRAINS.filter(t => t.gps && Number.isFinite(t.gps.lat) && Number.isFinite(t.gps.lng))
+      .map(t => ({ lat: t.gps.lat, lng: t.gps.lng, label: t.lieu, sub: tr(t, LANG, "titre"), href: `${R}${LANG === "en" ? "en/" : ""}terrains/${t.id}/` }));
+    if (pts.length) import("./map.js").then(m => m.drawMap(mapEl, pts, R));
+  }
 }
 
+/* ---------- fiche terrain ---------- */
+if (PAGE === "terrain") {
+  const vf = $("visitForm");
+  if (vf) {
+    const d = $("vDate"); d.min = todayISO();
+    vf.addEventListener("submit", e => {
+      e.preventDefault();
+      const num = document.querySelector('a[href^="https://wa.me/"]').href.match(/wa\.me\/(\d+)/)[1];
+      const msg = [U.visitMsg(vf.dataset.titre, vf.dataset.lieu, fmtDate(d.value), U.slots[$("vSlot").value]),
+        `${U.name} : ${$("vName").value.trim()}`, $("vTel").value.trim() ? `${U.tel} : ${$("vTel").value.trim()}` : ""].filter(Boolean).join("\n");
+      const url = waLink(num, msg), note = $("visitNote");
+      note.hidden = false; note.innerHTML = U.ready(url);
+      openWa(url);
+    });
+  }
+  $("shareBtn")?.addEventListener("click", async () => {
+    const data = { title: document.title, url: location.href };
+    if (navigator.share) { try { await navigator.share(data); return; } catch (err) { if (err.name === "AbortError") return; } }
+    try { await navigator.clipboard.writeText(location.href); toast(U.linkCopied); } catch (_) { /* le bouton ne fait rien si le presse-papiers est refusé */ }
+  });
+  if (mapEl) import("./map.js").then(m => m.drawMap(mapEl, [{ lat: +mapEl.dataset.lat, lng: +mapEl.dataset.lng, label: mapEl.dataset.label }], R));
+}
+
+syncFavs();
+
+/* ---------- ouverture instantanée et mode hors ligne ---------- */
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  addEventListener("load", () => navigator.serviceWorker.register(R + "sw.js").catch(() => {}));
+}
