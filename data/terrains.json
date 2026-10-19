@@ -19,24 +19,19 @@
       ],
       "image": "images/yamoussoukro.webp",
       "fiche": "images/fiche-yamoussoukro.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "500 m² plots near the airport",
+        "doc": "Land certificate",
         "points": [
           "100 plots available",
           "Near the airport extension",
           "Ideal first investment"
-        ],
-        "doc": "Land certificate"
+        ]
       }
     },
     {
       "id": "jacqueville",
-      "statut": "disponible",
+      "statut": "reserve",
       "zone": "Jacqueville",
       "lieu": "Jacqueville",
       "titre": "2 lots de 600 m² collés",
@@ -53,19 +48,14 @@
       ],
       "image": "images/jacqueville.webp",
       "fiche": "images/fiche-jacqueville.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "2 adjoining 600 m² plots",
+        "doc": "TF + ACD",
         "points": [
           "Terre Promise subdivision",
           "Along the Y4 road",
           "1 km from the sea"
-        ],
-        "doc": "TF + ACD"
+        ]
       }
     },
     {
@@ -77,7 +67,6 @@
       "type": "lot",
       "m2": 500,
       "prix": 11000000,
-      "unite": "",
       "lots": 1,
       "doc": "ACD introduite · TF créé",
       "points": [
@@ -87,19 +76,14 @@
       ],
       "image": "images/vitre2-betigbo-tf.webp",
       "fiche": "images/fiche-vitre2-betigbo-tf.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "500 m² plot with land title created",
+        "doc": "ACD filed · TF created",
         "points": [
           "Only 1 plot available",
           "Land title already created",
           "Signing at the notary's office"
-        ],
-        "doc": "ACD filed · TF created"
+        ]
       }
     },
     {
@@ -121,19 +105,14 @@
       ],
       "image": "images/anyama-adjame.webp",
       "fiche": "images/fiche-anyama-adjame.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "400 m² plots along the Y4",
+        "doc": "ACD",
         "points": [
           "20 plots already surveyed",
           "Along the Y4 road",
           "ACD available"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -155,19 +134,14 @@
       ],
       "image": "images/assini-koko-manzan.webp",
       "fiche": "images/fiche-assini-koko-manzan.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "500 m² waterfront plots",
+        "doc": "Approval",
         "points": [
           "50 plots available",
           "Past the lagoon, on the waterfront",
           "Approved subdivision"
-        ],
-        "doc": "Approval"
+        ]
       }
     },
     {
@@ -189,19 +163,14 @@
       ],
       "image": "images/vitre2-betigbo.webp",
       "fiche": "images/fiche-vitre2-betigbo.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "500 m² plots available",
+        "doc": "Approval",
         "points": [
           "50 plots available",
           "Approved subdivision",
           "Signing at the notary's office"
-        ],
-        "doc": "Approval"
+        ]
       }
     },
     {
@@ -223,19 +192,14 @@
       ],
       "image": "images/bingerville-barque.webp",
       "fiche": "images/fiche-bingerville-barque.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "400 m² plots in Bingerville",
+        "doc": "ACD",
         "points": [
           "20 plots available",
           "Route du Barque",
           "ACD available"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -247,7 +211,6 @@
       "type": "lot",
       "m2": 1097,
       "prix": 27500000,
-      "unite": "",
       "lots": 1,
       "doc": "Attestation",
       "points": [
@@ -257,19 +220,14 @@
       ],
       "image": "images/vitre1.webp",
       "fiche": "images/fiche-vitre1.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "1,097 m² on a main road",
+        "doc": "Attestation",
         "points": [
           "Single 1,097 m² plot",
           "On a main road",
           "Ideal for business or a home"
-        ],
-        "doc": "Attestation"
+        ]
       }
     },
     {
@@ -291,19 +249,14 @@
       ],
       "image": "images/km22-autoroute.webp",
       "fiche": "images/fiche-km22-autoroute.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "5,000 m² 1 km from the highway",
+        "doc": "ACD",
         "points": [
           "Area: 5,000 m²",
           "1 km from the Northern Highway",
           "Ideal for a real-estate project"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -325,19 +278,14 @@
       ],
       "image": "images/songon-kassemble.webp",
       "fiche": "images/fiche-songon-kassemble.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "1 hectare past the social housing",
+        "doc": "ACD",
         "points": [
           "Area: 1 hectare",
           "Past the social housing estate",
           "Ideal for developers or subdividers"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -359,19 +307,14 @@
       ],
       "image": "images/songon-ile-de-paques.webp",
       "fiche": "images/fiche-songon-ile-de-paques.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "1 hectare with a lake view",
+        "doc": "ACD",
         "points": [
           "Area: 1 hectare",
           "View of Lake Labion",
           "Access via Abrebis"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -393,19 +336,14 @@
       ],
       "image": "images/cocody-djorogobite2.webp",
       "fiche": "images/fiche-cocody-djorogobite2.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "6 hectares along the Y4",
+        "doc": "ACD",
         "points": [
           "Area: 6 hectares",
           "Djorogobité 2 extension, along the Y4",
           "For developers and investors"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -427,19 +365,14 @@
       ],
       "image": "images/bingerville-eloka.webp",
       "fiche": "images/fiche-bingerville-eloka.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "10 hectares between the expressway and the Y4",
+        "doc": "ACD",
         "points": [
           "Area: 10 hectares",
           "Between the expressway and the Y4",
           "For developers and investors"
-        ],
-        "doc": "ACD"
+        ]
       }
     },
     {
@@ -461,19 +394,14 @@
       ],
       "image": "images/vitre2-iles-taki.webp",
       "fiche": "images/fiche-vitre2-iles-taki.webp",
-      "photos": [],
-      "gps": {
-        "lat": null,
-        "lng": null
-      },
       "en": {
         "titre": "6 hectares in Vitré 2",
+        "doc": "Approval",
         "points": [
           "Area: 6 hectares",
           "Approved subdivision",
           "For developers and investors"
-        ],
-        "doc": "Approval"
+        ]
       }
     }
   ]
